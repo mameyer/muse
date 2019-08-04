@@ -1,0 +1,106 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Tets</h1>
+</div>
+
+<div id="gridContainer"></div>
+<div id="buttonContainer"></div>
+<div id="testChart"></div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        function getAlbums() {
+            $.ajax({
+                url: '@Url.Action("Get", "Album")',
+                success: function (result) {
+                    console.debug(result);
+                },
+                error: function () {
+                }
+            });
+        }
+
+        function getTopArtists() {
+            $.ajax({
+                url: '@Url.Action("Get", "TopArtist")',
+                success: function (result) {
+                    console.debug(result);
+                },
+                error: function () {
+                }
+            });
+        }
+
+        $("#buttonContainer").dxButton({
+            text: "Click me!",
+            onClick: function () {
+                getTopArtists();
+            }
+        });
+
+        $("#gridContainer").dxDataGrid({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "album.id",
+                loadUrl: '@Url.Action("Get", "Album")'
+            }),
+            remoteOperations: { groupPaging: true },
+            columns: ["album.id", "added_at", "album.name", "album.popularity", "album.label"],
+            showBorders: true
+        });
+
+        var chart = $("#testChart").dxChart({
+            palette: "Violet",
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "ID",
+                loadUrl: '@Url.Action("Get", "TestChartAPI")'
+            }),
+            commonSeriesSettings: {
+                argumentField: "country",
+                type: 'spline'
+            },
+            margin: {
+                bottom: 20
+            },
+            argumentAxis: {
+                valueMarginsEnabled: false,
+                discreteAxisDivisionMode: "crossLabels",
+                grid: {
+                    visible: true
+                }
+            },
+            series: [
+                { valueField: "hydro", name: "Hydro-electric" },
+                { valueField: "oil", name: "Oil" },
+                { valueField: "gas", name: "Natural gas" },
+                { valueField: "coal", name: "Coal" },
+                { valueField: "nuclear", name: "Nuclear" }
+            ],
+            legend: {
+                verticalAlignment: "bottom",
+                horizontalAlignment: "center",
+                itemTextPosition: "bottom"
+            },
+            title: { 
+                text: "Energy Consumption in 2004",
+                subtitle: {
+                    text: "(Millions of Tons, Oil Equivalent)"
+                }
+            },
+            "export": {
+                enabled: true
+            },
+            tooltip: {
+                enabled: true,
+                customizeTooltip: function (arg) {
+                    return {
+                        text: arg.valueText
+                    };
+                }
+            }
+        }).dxChart("instance");
+    </script>
+}

@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>@ViewData["Title"] - SpotifyStatistics</title>
+
+        <link rel="stylesheet" href="~/lib/bootswatch/dist/pulse/bootstrap.min.css" id="themeLink" />
+        <link rel="stylesheet" href="~/css/site.css" />
+
+        <link rel="stylesheet" href="~/lib/devextreme/css/dx.common.css">
+        <link rel="stylesheet" href="~/lib/devextreme/css/dx.light.css">
+    </head>
+    <body>
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SpotifyStatistics</a>
+
+                    <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li><a asp-controller="Album" asp-action="Index" class="nav-link">Albums</a></li>
+                            <li><a asp-controller="TopArtist" asp-action="Index" class="nav-link">Top Artists</a></li>
+                            <li><a asp-controller="TopTrack" asp-action="Index" class="nav-link">Top Tracks</a></li>
+                            <li><a asp-controller="Recommendation" asp-action="Index" class="nav-link">Recommendations</a></li>
+                        }
+                    </ul>
+
+                    <ul class="navbar-nav my-2 my-lg-0">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li><a asp-controller="Home" asp-action="UserProfile" class="nav-link">Hello @User.Identity.Name!</a></li>
+                            <li><a href="~/logout" class="nav-link">Log Out</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="~/login" class="nav-link">Log In with Spotify</a></li>
+                        }
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <main class="container-fluid">
+            <partial name="_CookieConsentPartial" />
+
+            @RenderBody()
+        </main>
+    
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+
+        
+        <script src="~/lib/devextreme/js/dx.all.js" asp-append-version="true"></script>
+        <script src="~/lib/devextreme-aspnet-data/js/dx.aspnet.data.js" asp-append-version="true"></script>
+
+        @RenderSection("Scripts", required: false)
+    </body>
+</html>

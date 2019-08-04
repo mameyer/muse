@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="DevExtreme.Web" Version="19.1.4" />
+    <PackageReference Include="DevExtreme.AspNet.Data" Version="2.3.0" />
+    <PackageReference Include="FluentSpotifyApi" Version="1.4.0" />
+    <PackageReference Include="FluentSpotifyApi.AuthorizationFlows.AspNetCore" Version="1.4.0" />
+    <PackageReference Include="FluentSpotifyApi.Core" Version="1.4.0" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Inflatable.Lastfm" Version="1.1.0.339" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../BackgroundServices/BackgroundServices.csproj" />
+  </ItemGroup>
+
+</Project>

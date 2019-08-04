@@ -1,0 +1,31 @@
+<div class="text-center">
+    <h1 class="display-4">Top artists</h1>
+</div>
+
+<div id="artistGrid"></div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        function getTopArtists() {
+            $.ajax({
+                url: '@Url.Action("Get", "TopArtistApi")',
+                success: function (result) {
+                    console.debug(result);
+                },
+                error: function () {
+                }
+            });
+        }
+
+        $("#artistGrid").dxDataGrid({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "name",
+                loadUrl: '@Url.Action("Get", "TopArtistApi")'
+            }),
+            remoteOperations: { groupPaging: true },
+            columns: ["name", "rank", "genresString", "popularity", "bio"],
+            showBorders: true
+        });
+    </script>
+}

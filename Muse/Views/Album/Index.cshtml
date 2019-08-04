@@ -1,0 +1,31 @@
+<div class="text-center">
+    <h1 class="display-4">Albums</h1>
+</div>
+
+<div id="albumGrid"></div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        function getAlbums() {
+            $.ajax({
+                url: '@Url.Action("Get", "AlbumApi")',
+                success: function (result) {
+                    console.debug(result);
+                },
+                error: function () {
+                }
+            });
+        }
+
+        $("#albumGrid").dxDataGrid({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "album.id",
+                loadUrl: '@Url.Action("Get", "AlbumApi")'
+            }),
+            remoteOperations: { groupPaging: true },
+            columns: ["album.id", "added_at", "album.name", "album.popularity", "album.label"],
+            showBorders: true
+        });
+    </script>
+}
