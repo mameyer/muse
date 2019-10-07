@@ -1,0 +1,85 @@
+<div id="toolbar"></div>
+
+<div id="artistGrid"></div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        $("#toolbar").dxToolbar({
+            items: [
+                {
+                    location: 'center',
+                    locateInMenu: 'auto',
+                    template: function() {
+                        return $("<div class='toolbar-label'><b>Top artists</b></div>");
+                    }
+                },
+                {
+                    location: 'after',
+                    template: function() {
+                        return $("<div id='timeRangeSelect'></div>");
+                    }
+                }
+            ]
+        });
+
+        $("#timeRangeSelect").dxSelectBox({
+            items: [
+                {
+                    Id: "ShortTerm",
+                    Text: "ShortTerm"
+                },
+                {
+                    Id: "MediumTerm",
+                    Text: "MediumTerm"
+                },
+                {
+                    Id: "LongTerm",
+                    Text: "LongTerm"
+                }],
+            valueExpr: "Id",
+            displayExpr: "Text",
+            value: "ShortTerm",
+            onValueChanged: function(args) {
+                var grid = $("#artistGrid").dxDataGrid("instance");
+                grid.refresh();
+            }
+        });
+
+        function getTimeRange() {
+            var timeRangeSelect = $("#timeRangeSelect").dxSelectBox("instance");
+            if (!timeRangeSelect) return "ShortTerm";
+            return timeRangeSelect.option("value");
+        }
+
+        function getTopArtists() {
+            $.ajax({
+                url: '@Url.Action("Get", "TopArtistApi")',
+                data: { timeRange: getTimeRange() },
+                success: function (result) {
+                    console.debug(result);
+                },
+                error: function () {
+                }
+            });
+        }
+
+        $("#artistGrid").dxDataGrid({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "Id",
+                loadUrl: '@Url.Action("Get", "TopArtistApi")',
+                loadParams: { timeRange: function() { return getTimeRange(); } }
+            }),
+            remoteOperations: { groupPaging: true },
+            columns: ["Id", "Name", "Rank", "GenresString", "Popularity", "Bio"],
+            showBorders: true
+        });
+    </script>
+}
+
+<style>
+    .toolbar-label,
+    .toolbar-label > b {
+        font-size: 16px;
+    }
+</style>

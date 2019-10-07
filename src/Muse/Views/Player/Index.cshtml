@@ -1,0 +1,414 @@
+<div id="wrapper" style="width: 100%; height: 410px;">
+    <div style="float: left; width: 450px;">
+        <h4>Features:</h4>
+        <div id="trackFeatures"></div>
+    </div>
+
+    <div style="margin-left: 20px; float: left; width: calc(100% - 500px); height: 100%;">
+        <div id="track-info" style="width: calc(100% - 220px); float: left; height: 100%;"></div>
+	    <div style="width: 200px; margin-left: 10px; float: left; height: 100%;">
+            <div style="height: 50px;"></div>
+            <div style="height: calc(100% - 50px);">
+	            <div id="loudness"></div>
+            </div>
+	    </div>
+    </div>
+</div>
+
+<div id="audioAnalysis"></div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        var useGIF = false;
+        var audioAnalysisSections = null;
+        var loudness_max = 60;
+
+        function getFeaturesAnalysisForm() {
+            return $("#trackFeatures").dxForm("instance");
+        }
+
+        function getAudioAnalysisChart() {
+            return $("#audioAnalysis").dxChart("instance");
+        }
+
+        function featureAnalysis() {
+            $.ajax({
+                url: '@Url.Action("Get", "FeatureAnalysisApi")',
+                data: {
+                    Id: currentTrack.item.id
+                },
+                success: function (result) {
+                    getFeaturesAnalysisForm().option("formData", result);
+                }
+            });
+        }
+
+        function getLoudnessChart() {
+            return $("#loudness").dxChart("instance");
+        }
+
+        function updateAudioAnalysisChartConstantLines(diff) {
+            var audioAnalysisChart = getAudioAnalysisChart();
+            var constantLines = [];
+
+            if (audioAnalysisSections) constantLines = audioAnalysisSections;
+
+            var progress = currentTrack.progress_ms;
+            if (diff) progress += diff;
+
+            var seconds = progress / 1000.0;
+
+            if (currentTrack.progress_ms) constantLines = constantLines.concat([ { value: seconds, color: 'red', dashStyle: 'dash', width: 3 } ]);
+
+            audioAnalysisChart.option("argumentAxis.constantLines", constantLines);
+
+	        var loudnessChart = getLoudnessChart();
+
+            var series = audioAnalysisChart.getSeriesByName("segments");
+            var filteredPoints = series.getAllPoints().filter(e => e.data.x_3 < (seconds + 0.5));
+            if (filteredPoints.length > 0) {
+                var point = filteredPoints[filteredPoints.length - 1];
+                point.select();
+
+                ps = filteredPoints.slice(Math.max(filteredPoints.length - 25, 0)).map((o, index) => ({ x: index +1, y: loudness_max +  o.data.y_3 }));
+
+                //var s = loudnessChart.getSeriesByName("loudness");
+                //var p0 = s.getAllPoints()[0];
+                //p0.y = point.data.y_3;
+
+	            loudnessChart.option("dataSource", ps);
+                loudnessChart.option("valueAxis.visualRange", [40, loudness_max+ 5]);
+            }
+        }
+
+        function getPitchClass(k) {
+            switch(k) {
+                case 0:
+                    return "C";
+
+                case 1:
+                    return "C#/Db";
+
+                case 2:
+                    return "D";
+
+                case 3:
+                    return "D#/Eb";
+
+                case 4:
+                    return "E";
+
+                case 5:
+                    return "E#/Fb";
+
+                case 6:
+                    return "F";
+
+                case 7:
+                    return "F#/Gb";
+
+                case 8:
+                    return "G";
+
+                case 9:
+                    return "G#/Ab";
+
+                case 10:
+                    return "A";
+
+                case 11:
+                    return "A#/B";
+
+                default:
+                    return "/";
+            }
+        }
+
+        function audioAnalysis() {
+            if (!currentTrack) return;
+
+            $.ajax({
+                url: '@Url.Action("Get", "AudioAnalysisApi")',
+                data: {
+                    Id: currentTrack.item.id
+                },
+                success: function (result) {
+                    var data = [];
+
+                    var bars = result.bars.map(p => ({ x_0: p.start, y_0: p.duration }));
+                    var beats = result.beats.map(p => ({ x_1: p.start, y_1: p.duration }));
+                    var tatums = result.tatums.map(p => ({ x_2: p.start, y_2: p.duration }));
+                    var segments = result.segments.map(p => ({ x_3: p.start, y_3: p.loudness_max }));
+
+                    var max_tempo = Math.max.apply(Math, result.sections.map(function(p) { return p.tempo; }));
+                    var min_tempo = Math.min.apply(Math, result.sections.filter(e => e.tempo > 0).map(function(p) { return p.tempo; }));
+                    
+                    var tempo_diff = max_tempo - min_tempo;
+                    var tempo = [];
+                    if (tempo_diff >= 0) tempo = result.sections
+                        .map(p => [ 
+                            { x_4: p.start, y_4: function(o) { if (o.tempo <= 0) return 0; return (o.tempo - min_tempo) / tempo_diff; }(p) },
+                            { x_4: p.start + p.duration, y_4: function(o) { if (o.tempo <= 0) return 0; return (o.tempo - min_tempo) / tempo_diff; }(p) }
+                            ])
+                        .flat();
+
+                    data = bars.concat(beats).concat(tatums).concat(segments).concat(tempo);
+
+                    var audioAnalysisChart = getAudioAnalysisChart();
+                    audioAnalysisChart.option("dataSource", data);
+
+                    var sections = result.sections
+                        .map(p => ({
+                            value: p.start,
+                            color: "grey",
+                            label: { text: "\nk: " + getPitchClass(p.key) + "\nconf: " + p.confidence + "\ntempo: " + p.tempo },
+                            width: (function(p) {
+                                var sectionWidth = 1;
+                                if (p.confidence >= 1) sectionWidth = 7;
+                                else if (p.confidence >= 0.75) sectionWidth = 6;
+                                else if (p.confidence >= 0.5) sectionWidth = 5;
+                                else if (p.confidence >= 0.4) sectionWidth = 4;
+                                else if (p.confidence >= 0.3) sectionWidth = 3;
+                                else if (p.confidence >= 0.2) sectionWidth = 2;
+                                return sectionWidth;
+                                })(p)
+                            }));
+
+                    audioAnalysisSections = sections;
+                    
+                    updateAudioAnalysisChartConstantLines();
+                }
+            });
+        }
+
+        $("#trackFeatures").dxForm({
+            colCount: 2,
+            items: [{
+                    dataField: "duration_ms"
+                }, {
+                    dataField: "key"
+                }, {
+                    dataField: "mode"
+                }, {
+                    dataField: "time_signature"
+                }, {
+                    dataField: "acousticness"
+                }, {
+                    dataField: "danceability"
+                }, {
+                    dataField: "energy"
+                }, {
+                    dataField: "instrumentalness"
+                }, {
+                    dataField: "liveness"
+                }, {
+                    dataField: "loudness"
+                }, {
+                    dataField: "speechiness"
+                }, {
+                    dataField: "valence"
+                }, {
+                    dataField: "tempo"
+                }, {
+                    dataField: "id"
+                }]
+        });
+
+        $("#audioAnalysis").dxChart({
+            dataSource: [],
+            height: 480,
+            commonSeriesSettings: {
+                type: "scatter"
+            },
+            animation: { enabled: false },
+            series: [{
+                name: "bars",
+                argumentField: "x_0",
+                valueField: "y_0",
+                axis: "axis_0",
+                point: {
+                    size: 8
+                }
+            },
+            {
+                name: "beats",
+                argumentField: "x_1",
+                valueField: "y_1",
+                axis: "axis_0",
+                point: {
+                    size: 4
+                }
+            },
+            {
+                name: "tatums",
+                argumentField: "x_2",
+                valueField: "y_2",
+                color: 'pink',
+                axis: "axis_0",
+                point: {
+                    size: 4
+                }
+            },
+            {
+                name: "segments",
+                argumentField: "x_3",
+                valueField: "y_3",
+                color: 'green',
+                axis: "axis_1",
+                seriesSelectionMode: 'single',
+                point: {
+                    size: 5,
+                    symbol: 'cross'
+                }
+            },
+            {
+                name: "tempo",
+                argumentField: "x_4",
+                valueField: "y_4",
+                color: 'blue',
+                axis: "axis_0",
+                type: 'stepline'
+            }],
+            argumentAxis:{
+                grid:{
+                    visible: true
+                },
+                label: {
+                    format: function(e) {
+                        var minutes = Math.floor(e / 60);
+                        var seconds = e - minutes*60;
+
+                        var minutesText = "" + minutes;
+                        if (minutes < 10) minutesText =  "0" + minutesText;
+
+                        var secondsText = "" + seconds;
+                        if (seconds < 10) secondsText =  "0" + secondsText;
+
+                        return minutesText + ":" + secondsText;
+                    }
+                }
+            },
+            legend: {
+                visible: true,
+                horizontalAlignment: 'center',
+                verticalAlignment: 'bottom'
+            },
+            zoomAndPan: {
+                valueAxis: "both",
+                argumentAxis: "both",
+                dragToZoom: true,
+                allowMouseWheel: true,
+                panKey: "shift"
+            }, valueAxis : [
+                {
+                    name: "axis_0",
+                    position: "left"
+                    //autoBreaksEnabled: true
+                },
+                {
+                    name: "axis_1",
+                    position: "right"
+                    //autoBreaksEnabled: true
+                }
+            ]
+        });
+
+
+        $("#loudness").dxChart({
+            dataSource: [ { x: 0, y: 100 }, { x: 1, y: loudness_max} ],
+            commonSeriesSettings: {
+                type: "bar"
+            },
+            series: [{
+                name: "loudness",
+                argumentField: "x",
+                valueField: "y"
+            }],
+            animation: { enabled: false },
+            adjustOnZoom: false,
+            valueAxis: {
+                visualRange: [40, loudness_max]
+            }
+        });
+
+        function currentPlayingCallback(hasChanged, diff) {
+            if (!currentTrack) {
+                $("#track-info").html("loading..");
+                getFeaturesAnalysisForm().option("formData", result);
+                getAudioAnalysisChart().option("dataSource", []);
+                return;
+            }
+
+            var url = currentTrack.item.album.images[0].url;
+            if (useGIF) url = "img/trump.gif";
+
+            if (hasChanged) {
+                var result = $("<div>");
+                $("<img>")
+                    .css("float", "left")
+                    .css("margin-top", "20px")
+                    .attr("height", 350)
+                    .attr("width", 350)
+                    .attr("src", url)
+                    .appendTo(result);
+                $("<div>")
+                    .css("float", "left")
+                    .css("width", "calc(100% - 400px)")
+                    .css("margin-left", "20px")
+                    .html("<h4>" + currentTrack.item.name + "</h4><p></p>"
+                        + "<u>artists:</u> " + currentTrack.item.artists.map(f => f.name).join(", ") 
+                        + "  |  <u>album:</u> " + currentTrack.item.album.name + "<p></p>"
+                        + "<u>popularity:</u> " + currentTrack.item.popularity
+                        + "  |  <u>device:</u> " + currentTrack.device.name + "<p></p>"
+                        + "<div id='artist-info'></div>")
+                    .appendTo(result);
+                $("#track-info").html(result);
+
+                featureAnalysis();
+                audioAnalysis();
+
+                updateArtistInfo();
+            } else {
+                if ((lastUpdate - newSince) > 500) updateAudioAnalysisChartConstantLines(diff);
+            }
+        }
+
+        function updateArtistInfo() {
+            if (!currentTrack) {
+                $("#artist-info").html("");
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("Get", "LastFMApi")',
+                data: {
+                    artist: currentTrack.item.artists[0].name,
+                    track: currentTrack.item.name
+                },
+                success: function (e) {
+                    if (!e) return;
+                    $("#artist-info").html("<div>"
+                        + "<u>bio:</u></br>" + e.Artist.Bio.Summary + "<p></p>"
+                        + "<u>similar:</u></br>" + e.Artist.Similar.map(f => f.Name).join(",") + "<p></p>"
+                        + "<u>tags:</u></br>" + e.Track.TopTags.map(f => f.Name).join(",")
+                        + "</div>");
+                }
+            });
+        }
+    </script>
+}
+
+<style>
+    #audioAnalysis {
+        height: 480px;
+    }
+
+    #loudness {
+        height: 100%;
+    }
+
+    #trackFeatures {
+        font-size: 10px;
+    }
+</style>

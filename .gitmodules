@@ -1,0 +1,6 @@
+[submodule "src/SpotifyApi.NetCore"]
+	path = src/SpotifyApi.NetCore
+	url = git@pi-master.fritz.box:/srv/git/muse.git
+[submodule "src/AspNetCoreLocalization"]
+	path = src/AspNetCoreLocalization
+	url = git@pi-master.fritz.box:/srv/git/muse.git

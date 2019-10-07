@@ -1,0 +1,207 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Tasks</h1>
+</div>
+
+<div id="queues">
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        var taskMonitoringHubConn = new signalR.HubConnectionBuilder()
+            .withUrl("/taskLogging")
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+        taskMonitoringHubConn.on("update",
+            (e) => {
+                updateMonitoring(e);
+            });
+        taskMonitoringHubConn.start()
+            .then(_ => taskMonitoringHubConn.invoke("AssociateJob", "TaskLogging"))
+            .catch(err => console.error(err.toString()));
+
+        window.onbeforeunload = function () {
+            taskMonitoringHubConn.stop();
+        };
+
+        var tasks = {};
+
+        function updateMonitoring(e) {
+            var queueState = "WAITING";
+            if (e.action == "RUN_TASK") {
+                queueState = "RUNNING";
+            }
+            updateQueue(e.queue, queueState);
+
+            switch (e.action) {
+                case "RUN_TASK":
+                case "STOP_TASK":
+                case "COMPLETED_TASK":
+                    updateTask(e.queue, e.action, e.task);
+                    break;
+
+                case "FINISHED_ITERATION":
+                    updateQueueResult(e.queue, e.result);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        function addQueue(name, state) {
+            $("#queues").append("<div class='queue' id='queue_" + name + "'>"
+                + "<div class='queue-name' id='queue_" + name + "_name'>"
+                    + name
+                    + "<i class='fas fa-sync queue-icon'></i>"
+                + "</div>"
+                + "<div class='queue-state' id='queue_" + name + "_state'>" + state + "</div>"
+                + "<div class='queue-tasks' id='queue_" + name + "_tasks'></div>"
+                + "<div class='queue-result' id='queue_" + name + "_result'></div>"
+                + "</div>");
+        }
+
+        function updateQueueState(name, state) {
+            $("#queue_" + name + "_state").html(state);
+        }
+
+        function updateQueueResult(name, result) {
+            var res = "OK";
+            if (result && result.errors && result.errors.length > 0) {
+                res = result.errors.map(x => x.Message).join("<br />");
+            }
+
+            $("#queue_" + name + "_result").html(res);
+        }
+
+        function updateQueue(name, state) {
+            if (!(name in tasks)) {
+                tasks[name] = [];
+                addQueue(name, state);
+            } else {
+                updateQueueState(name, state)
+            }
+        }
+
+        function addTask(queue, name, state) {
+            $("#queue_" + queue + "_tasks").append("<div class='task'>"
+                + "<div class='task-name' id='queue_" + queue + "_task_" + name + "_name'>" + name + "</div>"
+                + "<div class='task-state' id='queue_" + queue + "_task_" + name + "_state'>" + state + "</div>"
+                + "<div class='task-parameters' id='queue_" + queue + "_task_" + name + "_parameters'></div>"
+                + "<div class='task-result' id='queue_" + queue + "_task_" + name + "_result'></div>"
+                + "</div>");
+        }
+
+        function updateTaskState(queue, name, state) {
+            $("#queue_" + queue + "_task_" + name + "_state").html(state);
+        }
+
+        function updateTaskParameters(queue, name, parameters) {
+            var params = [];
+            if (parameters) {
+                for (var prop in parameters) {
+                    if (prop == "dataLimit") params.push(prop + ": " + parameters[prop]);
+                    if (prop == "lastRun") {
+                        var lastRunDate = new Date(parameters[prop]);
+                        params.push(prop + ": " + DevExpress.localization.formatDate(lastRunDate, "yyyy/MM/dd HH:mm:ss"));
+                    }
+                }
+            }
+
+            $("#queue_" + queue + "_task_" + name + "_parameters").html(params.join("<br />"));
+        }
+
+        function updateTaskResult(queue, name, result) {
+            var res = [];
+            if (result) {
+                for (var prop in result) {
+                    if (prop == "num_vals_added") res.push(prop + ": " + result[prop]);
+                    if (prop == "string_vals_added") res.push(prop + ": " + result[prop]);
+                    if (prop == "bit_vals_added") res.push(prop + ": " + result[prop]);
+                }
+            }
+
+            $("#queue_" + queue + "_task_" + name + "_result").html(res.join("<br />"));
+        }
+
+        function updateTask(queue, state, task) {
+            var taskName = task.name;
+            var taskParameters = task.parameters;
+            var taskResult = task.result
+
+            console.debug("update task '" + taskName + "' [" + state + "]");
+
+            if (!(tasks[queue].includes(taskName))) {
+                tasks[queue].push(taskName);
+                addTask(queue, taskName, state, taskParameters);
+            } else {
+                updateTaskState(queue, taskName, state);
+                if (state == "RUN_TASK") updateTaskParameters(queue, taskName, taskParameters);
+                if (state == "COMPLETED_TASK") updateTaskResult(queue, taskName, taskResult);
+            }
+        }
+    </script>
+}
+
+<style>
+    .wrapper {
+        padding: 100px;
+        color: white;
+    }
+
+    .container {
+        width: 500px;
+        padding-bottom: 50px;
+        margin: auto;
+    }
+
+    .queue-icon {
+        float: right;
+    }
+
+    .queue {
+        border-radius: 25px;
+        padding: 10px;
+        margin: 10px;
+        background: #73AD21;
+    }
+
+    .queue-name {
+        font-size: large;
+        text-align: center;
+    }
+
+    .queue-state {
+        text-align: center;
+    }
+
+    .queue-tasks {
+        border-radius: 10px;
+        margin: 10px;
+        background-color: #6495ED;
+    }
+
+    .queue-result {
+        border-radius: 10px;
+        margin: 10px;
+        padding: 10px;
+        background-color: #DC143C;
+    }
+
+    .task {
+        padding: 10px;
+    }
+
+    .task-name {
+        text-align: center;
+    }
+    
+    .task-state {
+        margin: 5px;
+        text-align: center;
+    }
+</style>

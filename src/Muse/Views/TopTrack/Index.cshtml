@@ -1,0 +1,242 @@
+<div id="toolbar"></div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div id="topTrackGrid"></div>
+    </div>
+    <div class="col-md-4">
+        <div id="trackFeatures"></div>
+    </div>
+</div>
+
+<div id="audioAnalysis"></div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        $("#toolbar").dxToolbar({
+            items: [
+                {
+                    location: 'center',
+                    locateInMenu: 'auto',
+                    template: function() {
+                        return $("<div class='toolbar-label'><b>Top artists</b></div>");
+                    }
+                },
+                {
+                    location: 'after',
+                    template: function() {
+                        return $("<div id='timeRangeSelect'></div>");
+                    }
+                }
+            ]
+        });
+
+        $("#timeRangeSelect").dxSelectBox({
+            items: [
+                {
+                    Id: "ShortTerm",
+                    Text: "ShortTerm"
+                },
+                {
+                    Id: "MediumTerm",
+                    Text: "MediumTerm"
+                },
+                {
+                    Id: "LongTerm",
+                    Text: "LongTerm"
+                }],
+            valueExpr: "Id",
+            displayExpr: "Text",
+            value: "ShortTerm",
+            onValueChanged: function(args) {
+                var grid = $("#topTrackGrid").dxDataGrid("instance");
+                grid.refresh();
+            }
+        });
+
+        function getTimeRange() {
+            var timeRangeSelect = $("#timeRangeSelect").dxSelectBox("instance");
+            if (!timeRangeSelect) return "ShortTerm";
+            return timeRangeSelect.option("value");
+        }
+
+        function getTopTracks() {
+            $.ajax({
+                url: '@Url.Action("Get", "TopTrackApi")',
+                data: { timeRange: function() { return getTimeRange(); } },
+                success: function (result) {
+                    console.debug(result);
+                },
+                error: function () {
+                }
+            });
+        }
+
+        function searchPlaylist() {
+            $.ajax({
+                url: '@Url.Action("Get", "SearchApi")',
+                success: function (result) {
+                    console.debug(result);
+                    var id = result.tracks.items[0].Id;
+                    featureAnalysis(id);
+                    audioAnalysis(id);
+                },
+                error: function () {
+                }
+            });
+        }
+
+        function featureAnalysis(id) {
+            console.debug("featureAnalysis: " + id);
+            $.ajax({
+                url: '@Url.Action("Get", "FeatureAnalysisApi")',
+                data: {
+                    Id: id
+                },
+                success: function (result) {
+                    console.debug(result);
+                    $("#trackFeatures").dxForm("instance").option("formData", result);
+                },
+                error: function (e) {
+                    console.debug(e);
+                }
+            });
+        }
+
+        function audioAnalysis(id) {
+            console.debug("audioAnalysis: " + id);
+            $.ajax({
+                url: '@Url.Action("Get", "AudioAnalysisApi")',
+                data: {
+                    Id: id
+                },
+                success: function (result) {
+                    var data = result.bars.map(p => ({ x_0: p.start, y_0: p.duration }));
+                    data = data.concat(result.beats.map(p => ({ x_1: p.start, y_1: p.duration })));
+                    data = data.concat(result.tatums.map(p => ({ x_2: p.start, y_2: p.duration })));
+                    $("#audioAnalysis").dxChart("instance").option("dataSource", data);
+
+                    var sections = result.sections.map(p => ({ value: p.start, label: { text: "t: " + p.tempo + "<br />k: " + p.PitchClass + "<br />ts: " + p.time_signature } }));
+                    console.debug(sections);
+                    $("#audioAnalysis").dxChart("instance").option("argumentAxis.constantLines", sections);
+                },
+                error: function () {
+                }
+            });
+        }
+
+        $("#topTrackGrid").dxDataGrid({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "Id",
+                loadUrl: '@Url.Action("Get", "TopTrackApi")',
+                loadParams: { timeRange: function() { return getTimeRange(); } }
+            }),
+            remoteOperations: { groupPaging: true },
+            columns: ["Id", "Name", "Rank", "Album", "ArtistsString", "GenresString", "PopularitiesString"],
+            showBorders: true,
+            selection: {
+                mode: "single"
+            },
+            onSelectionChanged: function (selectedItems) {
+                var track = selectedItems.selectedRowsData[0];
+                if (track) {
+                    featureAnalysis(track.Id);
+                    audioAnalysis(track.Id);
+                }
+            }
+        });
+
+        $("#trackFeatures").dxForm({
+            colCount: 1,
+            items: [{
+                    dataField: "duration_ms"
+                }, {
+                    dataField: "key"
+                }, {
+                    dataField: "mode"
+                }, {
+                    dataField: "time_signature"
+                }, {
+                    dataField: "acousticness"
+                }, {
+                    dataField: "danceability"
+                }, {
+                    dataField: "energy"
+                }, {
+                    dataField: "instrumentalness"
+                }, {
+                    dataField: "liveness"
+                }, {
+                    dataField: "loudness"
+                }, {
+                    dataField: "speechiness"
+                }, {
+                    dataField: "valence"
+                }, {
+                    dataField: "tempo"
+                }, {
+                    dataField: "id"
+                }, {
+                    dataField: "uri"
+                }, {
+                    dataField: "track_href"
+                }, {
+                    dataField: "analysis_url"
+                }, {
+                    dataField: "type"
+                }]
+        });
+
+        $("#audioAnalysis").dxChart({
+            dataSource: [],
+            commonSeriesSettings: {
+                type: "scatter"
+            },
+            series: [{
+                name: "bars",
+                argumentField: "x_0",
+                valueField: "y_0"
+            },
+            {
+                name: "beats",
+                argumentField: "x_1",
+                valueField: "y_1"
+            },
+            {
+                name: "tatums",
+                argumentField: "x_2",
+                valueField: "y_2"
+            }],
+            argumentAxis:{
+                grid:{
+                    visible: true
+                },
+                label: {
+                    format: function(e) {
+                        var minutes = Math.floor(e / 60);
+                        var seconds = e - minutes*60;
+
+                        var minutesText = "" + minutes;
+                        if (minutes < 10) minutesText =  "0" + minutesText;
+
+                        var secondsText = "" + seconds;
+                        if (seconds < 10) secondsText =  "0" + secondsText;
+
+                        return minutesText + ":" + secondsText;
+                    }
+                }
+            },
+            legend: {
+                visible: true
+            },
+            zoomAndPan: {
+                valueAxis: "both",
+                argumentAxis: "both",
+                dragToZoom: true,
+                allowMouseWheel: true,
+                panKey: "shift"
+            }
+        });
+    </script>
+}

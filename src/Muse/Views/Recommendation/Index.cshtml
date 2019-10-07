@@ -1,0 +1,482 @@
+@model Muse.Models.RecommendationOptions
+
+<div class="text-center">
+    <h1 class="display-4">Recommendations</h1>
+</div>
+
+<div id="recommendations-form">
+    <h5>Settings</h5>
+    <div class="dx-fieldset">
+        <div class="dx-field">
+            <div class="dx-field-label"></div>
+            <div class="dx-field-value">
+                <div id="load"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">Artists:</div>
+            <div class="dx-field-value">
+                <div id="artists"></div>
+                <div id="artistTimeRangeSelect"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">Tracks:</div>
+            <div class="dx-field-value">
+                <div id="tracks"></div>
+                <div id="trackTimeRangeSelect"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">Genres:</div>
+            <div class="dx-field-value">
+                <div id="genres"></div>
+                <div id="genreTimeRangeSelect"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">Acousticness:</div>
+            <div class="dx-field-value">
+                <div id="acousticness"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">Danceability:</div>
+            <div class="dx-field-value">
+                <div id="danceability"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">DurationMs:</div>
+            <div class="dx-field-value">
+                <div id="durationMs"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">Energy:</div>
+            <div class="dx-field-value">
+                <div id="energy"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">Instrumentalness:</div>
+            <div class="dx-field-value">
+                <div id="instrumentalness"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">Liveness:</div>
+            <div class="dx-field-value">
+                <div id="liveness"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">Loudness:</div>
+            <div class="dx-field-value">
+                <div id="loudness"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">Popularity:</div>
+            <div class="dx-field-value">
+                <div id="popularity"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">Speechiness:</div>
+            <div class="dx-field-value">
+                <div id="speechiness"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">Tempo:</div>
+            <div class="dx-field-value">
+                <div id="tempo"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">Valence:</div>
+            <div class="dx-field-value">
+                <div id="valence"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">Mode:</div>
+            <div class="dx-field-value">
+                <div id="mode"></div>
+            </div>
+        </div>
+        <div class="dx-field">
+            <div class="dx-field-label">TimeSignature:</div>
+            <div class="dx-field-value">
+                <div id="timeSignature"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="recommendations-result">
+    <h5>Result</h5>
+    <div id="recommendations"></div>
+</div>
+<div id="devices-list">
+    <h5>Devices</h5>
+    <div id="devices"></div>
+
+    <div id="current-track-info">
+        
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        var recommendationOptions = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model, Newtonsoft.Json.Formatting.Indented));
+
+        $("#artistTimeRangeSelect").dxSelectBox({
+            items: [
+                {
+                    id: "ShortTerm",
+                    text: "ShortTerm"
+                },
+                {
+                    id: "MediumTerm",
+                    text: "MediumTerm"
+                },
+                {
+                    id: "LongTerm",
+                    text: "LongTerm"
+                }],
+            valueExpr: "id",
+            displayExpr: "text",
+            value: "ShortTerm"
+        });
+
+        $("#genreTimeRangeSelect").dxSelectBox({
+            items: [
+                {
+                    id: "ShortTerm",
+                    text: "ShortTerm"
+                },
+                {
+                    id: "MediumTerm",
+                    text: "MediumTerm"
+                },
+                {
+                    id: "LongTerm",
+                    text: "LongTerm"
+                }],
+            valueExpr: "id",
+            displayExpr: "text",
+            value: "ShortTerm"
+        });
+
+        $("#trackTimeRangeSelect").dxSelectBox({
+            items: [
+                {
+                    id: "ShortTerm",
+                    text: "ShortTerm"
+                },
+                {
+                    id: "MediumTerm",
+                    text: "MediumTerm"
+                },
+                {
+                    id: "LongTerm",
+                    text: "LongTerm"
+                }],
+            valueExpr: "id",
+            displayExpr: "text",
+            value: "ShortTerm"
+        });
+
+        $("#artists").dxTagBox({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "Name",
+                loadUrl: '@Url.Action("Get", "TopArtistApi")',
+                loadParams: {
+                    timeRange: $("#artistTimeRangeSelect").dxSelectBox("instance").option("value")
+                }
+            }),
+            displayExpr: "Name",
+            valueExpr: "Id"
+        });
+
+        $("#tracks").dxTagBox({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "Name",
+                loadUrl: '@Url.Action("Get", "TopTrackApi")',
+                loadParams: {
+                    timeRange: $("#trackTimeRangeSelect").dxSelectBox("instance").option("value")
+                }
+            }),
+            displayExpr: "Name",
+            valueExpr: "Id"
+        });
+
+        $("#genres").dxTagBox({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "Name",
+                loadUrl: '@Url.Action("Get", "TopGenreApi")',
+                loadParams: {
+                    timeRange: $("#genreTimeRangeSelect").dxSelectBox("instance").option("value")
+                }
+            }),
+            displayExpr: "Name",
+            valueExpr: "Name"
+        });
+
+        $("#acousticness").dxNumberBox({
+            value: recommendationOptions.Acousticness.Target,
+            max: recommendationOptions.Acousticness.Max,
+            min: recommendationOptions.Acousticness.Min,
+            onValueChanged: function(data) {
+                recommendationOptions.Acousticness.Target = data.value;
+            }
+        });
+
+        $("#danceability").dxNumberBox({
+            value: recommendationOptions.Danceability.Target,
+            max: recommendationOptions.Danceability.Max,
+            min: recommendationOptions.Danceability.Min,
+            onValueChanged: function(data) {
+                recommendationOptions.Danceability.Target = data.value;
+            }
+        });
+
+        $("#durationMs").dxNumberBox({
+            value: recommendationOptions.DurationMs.Target,
+            max: recommendationOptions.DurationMs.Max,
+            min: recommendationOptions.DurationMs.Min,
+            onValueChanged: function(data) {
+                recommendationOptions.DurationMs.Target = data.value;
+            }
+        });
+
+        $("#energy").dxNumberBox({
+            value: recommendationOptions.Energy.Target,
+            max: recommendationOptions.Energy.Max,
+            min: recommendationOptions.Energy.Min,
+            onValueChanged: function(data) {
+                recommendationOptions.Energy.Target = data.value;
+            }
+        });
+
+        $("#instrumentalness").dxNumberBox({
+            value: recommendationOptions.Instrumentalness.Target,
+            max: recommendationOptions.Instrumentalness.Max,
+            min: recommendationOptions.Instrumentalness.Min,
+            onValueChanged: function(data) {
+                recommendationOptions.Instrumentalness.Target = data.value;
+            }
+        });
+
+        $("#liveness").dxNumberBox({
+            value: recommendationOptions.Liveness.Target,
+            max: recommendationOptions.Liveness.Max,
+            min: recommendationOptions.Liveness.Min,
+            onValueChanged: function(data) {
+                recommendationOptions.Liveness.Target = data.value;
+            }
+        });
+
+        $("#loudness").dxNumberBox({
+            value: recommendationOptions.Loudness.Target,
+            max: recommendationOptions.Loudness.Max,
+            min: recommendationOptions.Loudness.Min,
+            onValueChanged: function(data) {
+                recommendationOptions.Loudness.Target = data.value;
+            }
+        });
+
+        $("#popularity").dxNumberBox({
+            value: recommendationOptions.Popularity.Target,
+            max: recommendationOptions.Popularity.Max,
+            min: recommendationOptions.Popularity.Min,
+            onValueChanged: function(data) {
+                recommendationOptions.Popularity.Target = data.value;
+            }
+        });
+
+        $("#speechiness").dxNumberBox({
+            value: recommendationOptions.Speechiness.Target,
+            max: recommendationOptions.Speechiness.Max,
+            min: recommendationOptions.Speechiness.Min,
+            onValueChanged: function(data) {
+                recommendationOptions.Speechiness.Target = data.value;
+            }
+        });
+
+        $("#tempo").dxNumberBox({
+            value: recommendationOptions.Tempo.Target,
+            max: recommendationOptions.Tempo.Max,
+            min: recommendationOptions.Tempo.Min,
+            onValueChanged: function(data) {
+                recommendationOptions.Tempo.Target = data.value;
+            }
+        });
+
+        $("#valence").dxNumberBox({
+            value: recommendationOptions.Valence.Target,
+            max: recommendationOptions.Valence.Max,
+            min: recommendationOptions.Valence.Min,
+            onValueChanged: function(data) {
+                recommendationOptions.Valence.Target = data.value;
+            }
+        });
+
+        $("#mode").dxNumberBox({
+            value: recommendationOptions.Mode.Target,
+            max: recommendationOptions.Mode.Max,
+            min: recommendationOptions.Mode.Min,
+            onValueChanged: function(data) {
+                recommendationOptions.Mode.Target = data.value;
+            }
+        });
+
+        $("#timeSignature").dxNumberBox({
+            value: recommendationOptions.TimeSignature.Target,
+            max: recommendationOptions.TimeSignature.Max,
+            min: recommendationOptions.TimeSignature.Min,
+            onValueChanged: function(data) {
+                recommendationOptions.TimeSignature.Target = data.value;
+            }
+        });
+
+        $("#recommendations").dxList({
+            dataSource: [],
+            height: 800,
+            allowItemDeleting: false,
+            itemTemplate: function(data, index) {
+                var result = $("<div>").addClass("recommendation");
+                $("<img>")
+                    .css("float", "left")
+                    .attr("height", 100)
+                    .attr("width", 100)
+                    .attr("src", data.album.images[0].url)
+                    .appendTo(result);
+                $("<div>")
+                    .css("float", "left")
+                    .html(data.name + "<p></p>" + "album:<br/>" + data.album.name + "<p></p>" + "artists:</br>" + data.artists.map(e => e.name).join("</br>"))
+                    .appendTo(result);
+                return result;
+            }
+        });
+
+        $("#load").dxButton({
+            text: "Load",
+            onClick: function() {
+                var artists = $("#artists").dxTagBox("instance").option("selectedItems");
+                console.debug(artists);
+                recommendationOptions.Artists = artists.map(x => x.Id);
+
+                var tracks = $("#tracks").dxTagBox("instance").option("selectedItems");
+                console.debug(tracks);
+                recommendationOptions.Tracks = tracks.map(x => x.Id);
+                
+                var genres = $("#genres").dxTagBox("instance").option("selectedItems");
+                console.debug(genres);
+                recommendationOptions.Genres = genres.map(x => x.Name);
+
+                $.ajax({
+                    url: '@Url.Action("Get", "RecommendationApi")',
+                    data: {
+                        options: JSON.stringify(recommendationOptions)
+                    },
+                    success: function (result) {
+                        console.debug(result);
+                        $("#recommendations").dxList("instance").option("dataSource", result.tracks);
+                    },
+                    error: function () {
+                    }
+                });
+            }
+        });
+
+        $("#devices").dxList({
+            dataSource: [],
+            height: 300,
+            allowItemDeleting: false,
+            itemTemplate: function(data, index) {
+                var result = $("<div>").addClass("device");
+                $("<div>").text(data.name).appendTo(result);
+                $("<div>").text(data.type).appendTo(result);
+                return result;
+            }
+        });
+
+        function getDevices() {
+            console.debug("get devices..");
+            var devices = null;
+            $.ajax({
+                url: '@Url.Action("Get", "DeviceApi")',
+                success: function (result) {
+                    devices = result;
+                },
+                error: function () {
+                },
+                async: false
+            });
+            return devices;
+        }
+
+        function getPlayback() {
+            var playback = null;
+            $.ajax({
+                url: '@Url.Action("Get", "PlaybackApi")',
+                success: function (result) {
+                    console.debug(result);
+                    playback = result;
+                },
+                error: function () {
+                },
+                async: false
+            });
+            return playback;
+        }
+
+        function loadDevices() {
+            var devices = getDevices();
+            if (!devices) {
+                return;
+            }
+            $("#devices").dxList("instance").option("dataSource", devices);
+            if (devices.length > 0) {
+                var playback = getPlayback();
+                console.debug(playback);
+            }
+        }
+
+        loadDevices();
+    </script>
+}
+
+<style>
+    #form {
+        margin-top: 25px;
+    }
+
+    #recommendations-form, #recommendations-result, #devices-list {
+        background-color: rgba(191, 191, 191, 0.15);
+    }
+
+    #recommendations-form {
+        padding: 20px;
+        bottom: 0;
+        right: 0;
+        width: 500px;
+        top: 0;
+        float: left;
+    }
+
+    #recommendations-result {
+        float: left;
+        margin-left: 10px;
+        width: 500px;
+    }
+
+    #devices-list {
+        float: right;
+        margin-left: 10px;
+        width: 400px;
+    }
+</style>

@@ -1,0 +1,87 @@
+<div id="toolbar"></div>
+
+<div id="localPlaylistGrid"></div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        $("#toolbar").dxToolbar({
+            items: [
+                {
+                    location: 'center',
+                    locateInMenu: 'auto',
+                    template: function() {
+                        return $("<div class='toolbar-label'><b>Top artists</b></div>");
+                    }
+                }
+            ]
+        });
+
+        function getPlaylists() {
+            $.ajax({
+                url: '@Url.Action("Get", "LocalPlaylistApi")',
+                success: function (result) {
+                    console.debug(result);
+                },
+                error: function () {
+                }
+            });
+        }
+
+        $("#localPlaylistGrid").dxDataGrid({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "Id",
+                loadUrl: '@Url.Action("Get", "LocalPlaylistApi")'
+            }),
+            remoteOperations: { groupPaging: true },
+            columns: [ "Id", "Name", "SpotifyId", "Uri" ],
+            showBorders: true,
+            selection: {
+            mode: "multiple"
+            },
+            export: {
+                enabled: true,
+                fileName: "playlists",
+                allowExportSelectedData: true
+            },
+            masterDetail: {
+                enabled: true,
+                template: function(container, options) { 
+                    var playlist = options.data;
+
+                    $("<div>")
+                        .addClass("master-detail-caption")
+                        .text("Tracks:")
+                        .appendTo(container);
+
+                    $("<div>")
+                        .dxDataGrid({
+                            columnAutoWidth: true,
+                            showBorders: true,
+                            columns: [ "Id", "Track.Song.Id", "Track.Song.Name", "Track.Band.Id", "Track.Band.Name", "Track.Album.Id", "Track.Album.Name" ],
+                            dataSource: new DevExpress.data.DataSource({
+                                store: new DevExpress.data.CustomStore({
+                                    key: "Id",
+                                    load: function (loadOptions) {
+                                        return $.ajax({
+                                                url: '@Url.Action("Get", "LocalPlaylistTrackApi")',
+                                                data: {
+                                                    playlistId: playlist.Id
+                                                }
+                                            })
+                                        }
+                                })
+                            })
+                        }).appendTo(container);
+                }
+            }
+        });
+    </script>
+}
+
+<style>
+    .toolbar-label,
+    .toolbar-label > b {
+        font-size: 16px;
+    }
+</style>

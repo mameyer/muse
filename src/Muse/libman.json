@@ -1,0 +1,74 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+      {
+          // add this file if your project does not include it yet
+          "library": "jquery@3.5.1",
+          "provider": "cdnjs",
+          "destination": "wwwroot/js/devextreme",
+          "files": [
+              "jquery.js"
+          ]
+      },
+      {
+          "library": "cldrjs@0.5.1",
+          "provider": "cdnjs",
+          "destination": "wwwroot/js/devextreme/"
+      },
+      {
+          "library": "globalize@1.4.2",
+          "provider": "cdnjs",
+          "destination": "wwwroot/js/devextreme/"
+      },
+      {
+          // required for client-side export
+          "library": "jszip@3.2.1",
+          "provider": "cdnjs",
+          "destination": "wwwroot/js/devextreme/"
+      },
+      {
+          "library": "node_modules/devextreme/dist/js/",
+          "provider": "filesystem",
+          "destination": "wwwroot/js/devextreme/"
+      },
+      {
+          // required if you set up localization
+          "library": "node_modules/devextreme/dist/js/localization/",
+          "provider": "filesystem",
+          "destination": "wwwroot/js/devextreme/localization"
+      },
+      {
+          // required if you use a VectorMap control
+          "library": "node_modules/devextreme/dist/js/vectormap-data/",
+          "provider": "filesystem",
+          "destination": "wwwroot/js/devextreme/vectormap-data"
+      },
+      {
+          "library": "node_modules/devextreme/dist/css/dx.common.css",
+          "provider": "filesystem",
+          "destination": "wwwroot/css/devextreme/"
+      },
+      {
+          "library": "node_modules/devextreme/dist/css/dx.light.css",
+          "provider": "filesystem",
+          "destination": "wwwroot/css/devextreme/"
+      },
+      {
+          "library": "node_modules/devextreme/dist/css/icons/",
+          "provider": "filesystem",
+          "destination": "wwwroot/css/devextreme/icons"
+      },
+      {
+          // required if you use one of the Material Design Themes
+          "library": "node_modules/devextreme/dist/css/fonts/",
+          "provider": "filesystem",
+          "destination": "wwwroot/css/devextreme/fonts"
+      },
+      {
+          "library": "node_modules/devextreme-aspnet-data/js/dx.aspnet.data.js",
+          "provider": "filesystem",
+          "destination": "wwwroot/js/devextreme"
+      }
+  ]
+}

@@ -1,0 +1,138 @@
+<div id="toolbar"></div>
+
+<div id="playlistGrid"></div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        $("#toolbar").dxToolbar({
+            items: [
+                {
+                    location: 'center',
+                    locateInMenu: 'auto',
+                    template: function() {
+                        return $("<div class='toolbar-label'><b>Playlists</b></div>");
+                    }
+                }
+            ]
+        });
+
+        function getPlaylists() {
+            $.ajax({
+                url: '@Url.Action("Get", "PlaylistApi")',
+                success: function (result) {
+                    console.debug(result);
+                },
+                error: function () {
+                }
+            });
+        }
+
+        $("#playlistGrid").dxDataGrid({
+            dataSource: DevExpress.data.AspNet.createStore({
+                key: "id",
+                loadUrl: '@Url.Action("Get", "PlaylistApi")'
+            }),
+            remoteOperations: { groupPaging: true },
+            columns: [
+                "id",
+                "name",
+                "owner",
+                "href",
+                "public",
+                {
+                    type: "buttons",
+                    width: 60,
+                    buttons: [ {
+                        hint: "Clone",
+                        icon: "save",
+                        text: "store",
+                        onClick: function(e) {
+                            storePlaylist(e.row.data);
+                        }
+                    }]
+                },
+            ],
+            showBorders: true,
+            selection: {
+            mode: "multiple"
+            },
+            export: {
+                enabled: true,
+                fileName: "playlists",
+                allowExportSelectedData: true
+            },
+            masterDetail: {
+                enabled: true,
+                template: function(container, options) { 
+                    var playlist = options.data;
+
+                    $("<div>")
+                        .addClass("master-detail-caption")
+                        .text("Tracks:")
+                        .appendTo(container);
+
+                    $("<div>")
+                        .dxDataGrid({
+                            columnAutoWidth: true,
+                            showBorders: true,
+                            columns: [ "track.id", "track.name", "track.album.album_type", "track.album.id", "track.album.name", "track.duration_ms", "track.explicit", "track.popularity", "added_at", "added_by" ],
+                            dataSource: new DevExpress.data.DataSource({
+                                store: new DevExpress.data.CustomStore({
+                                    key: "track.id",
+                                    load: function (loadOptions) {
+                                        return $.ajax({
+                                                url: '@Url.Action("Get", "PlaylistTrackApi")',
+                                                data: {
+                                                    playlistId: playlist.id
+                                                }
+                                            });
+                                        }
+                                })
+                            }),
+                            masterDetail: {
+                                enabled: true,
+                                template: function(container, options) { 
+                                    var track = options.data.track;
+
+                                    $("<div>")
+                                        .addClass("master-detail-caption")
+                                        .text("Artists:")
+                                        .appendTo(container);
+
+                                    $("<div>")
+                                        .dxDataGrid({
+                                            columnAutoWidth: true,
+                                            showBorders: true,
+                                            columns: [ "id", "name" ],
+                                            dataSource: new DevExpress.data.DataSource({
+                                                store: new DevExpress.data.ArrayStore(track.artists)
+                                            }),
+                                            
+                                        }).appendTo(container);
+                                }
+                            }
+                        }).appendTo(container);
+                }
+            }
+        });
+
+        function storePlaylist(e) {
+            console.debug(e);
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("StorePlaylist", "PlaylistApi")',
+                data: {
+                    playlistId: e.id
+                }
+            });
+        }
+    </script>
+}
+
+<style>
+    .toolbar-label,
+    .toolbar-label > b {
+        font-size: 16px;
+    }
+</style>
