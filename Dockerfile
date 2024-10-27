@@ -1,15 +1,28 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
-WORKDIR /base
-COPY . .
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /source
+
+# copy csproj and restore as distinct layers
+COPY Muse.sln .
+COPY src/Muse/*.csproj ./src/Muse/
+COPY src/SpotifyApi/*.csproj ./src/SpotifyApi/
+COPY src/SpotifyApi/src/SpotifyApi.NetCore/*.csproj /source/src/SpotifyApi/src/SpotifyApi.NetCore/
+COPY src/BackgroundServices/*.csproj ./src/BackgroundServices/
+COPY src/TSGenerator/*.csproj ./src/TSGenerator/
+COPY src/TSGeneratorTests/*.csproj ./src/TSGeneratorTests/
 RUN dotnet restore
-RUN dotnet build -c Release -o /app
 
-FROM build AS publish
-RUN dotnet publish -c Release -o /app
+RUN mkdir local_packages
+RUN dotnet pack src/TSGenerator/TSGenerator.csproj
+RUN cp src/TSGenerator/bin/Release/*.nupkg local_packages 
+RUN dotnet restore srs/TSGeneratorTests/TSGeneratorTests.csproj
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS run
+# copy everything else and build app
+COPY . .
+WORKDIR /source/Muse
+RUN dotnet publish -c release -o /app --no-restore
+
+# final stage/image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=publish /app .
-WORKDIR /app
-EXPOSE 80
+COPY --from=build /app ./
 ENTRYPOINT ["dotnet", "Muse.dll"]

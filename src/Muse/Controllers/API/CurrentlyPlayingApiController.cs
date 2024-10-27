@@ -1,7 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using SpotifyApi.NetCore;
+using SpotifyAPI.Web;
 
 namespace Muse.Controllers.API
 {
@@ -12,18 +11,18 @@ namespace Muse.Controllers.API
         {
         }
 
-        private async Task<CurrentPlaybackContext> GetCurrentPlaybackInfo()
+        private async Task<CurrentlyPlayingContext> GetCurrentPlaybackInfo()
         {
             var accessToken = await GetAccessToken();
-            var playerApi = new PlayerApi(this.httpClient, accessToken);
-            return await playerApi.GetCurrentPlaybackInfo(accessToken);
+            var spotify = new SpotifyClient(accessToken);
+            return await spotify.Player.GetCurrentPlayback();
         }
 
-        public object Get()
+        public async Task<object> Get()
         {
             try
             {
-                var currentPlaybackContext = GetCurrentPlaybackInfo().Result;
+                var currentPlaybackContext = await GetCurrentPlaybackInfo();
                 return currentPlaybackContext;
             }
             catch (Exception ex)

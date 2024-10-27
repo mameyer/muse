@@ -1,0 +1,16 @@
+﻿<Project>
+	<PropertyGroup>
+		<_TSGeneratorTaskAssembly>..\tools\net7.0\TSGenerator.dll</_TSGeneratorTaskAssembly>
+	</PropertyGroup>
+
+	<UsingTask AssemblyFile="$(_TSGeneratorTaskAssembly)" TaskName="$(MSBuildThisFileName).TSBuildTask" />
+	<UsingTask AssemblyFile="$(_TSGeneratorTaskAssembly)" TaskName="$(MSBuildThisFileName).TSCleanTask" />
+
+	<Target Name="TSGeneratorClean" AfterTargets="CoreClean" Condition="'$(RunTSGenerator)' != 'False'">
+		<TSGenerator.TSCleanTask FileName="$(MSBuildProjectDirectory)\tsgeneratorconfig.json" />
+	</Target>
+
+	<Target Name="TSGeneratorBuild" BeforeTargets="CompileTypeScriptWithTSConfig" Condition="'$(RunTSGenerator)' != 'False'">
+		<TSGenerator.TSBuildTask FileName="$(MSBuildProjectDirectory)\tsgeneratorconfig.json" />
+	</Target>
+</Project>

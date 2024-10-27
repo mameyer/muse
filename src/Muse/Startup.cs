@@ -17,7 +17,7 @@ using Muse.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Localization.SqlLocalizer.DbStringLocalizer;
 using System.Text.Json;
-using Newtonsoft.Json.Serialization;
+//using Newtonsoft.Json.Serialization;
 
 namespace Muse
 {
@@ -33,18 +33,20 @@ namespace Muse
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(options =>
+            services
+            .AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = "Spotify";
             })
-            
             .AddCookie(options =>
             {
                 options.LoginPath = "/login";
                 options.LogoutPath = "/logout";
+                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             })
-
-            .AddSpotify(options =>
+            .AddSpotify("Spotify", options =>
             {
                 options.ClientId = Configuration["ClientId"];
                 options.ClientSecret = Configuration["ClientSecret"];
@@ -84,10 +86,6 @@ namespace Muse
                 });
 
             services.AddControllersWithViews()
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-                })
                 .AddRazorRuntimeCompilation();
 
             // Requires that LocalizationModelContext is defined
@@ -251,17 +249,19 @@ namespace Muse
             }
 
             // app.UseHttpsRedirection();
-            app.UseSignalR(routes =>
-            {
-                routes.MapHub<Hubs.CurrentlyPlayingHub>("/currentlyPlaying");
-                routes.MapHub<Hubs.TaskLoggingHub>("/taskLogging");
-            });
+            // app.MapHub<Hubs.CurrentlyPlayingHub>("/currentlyPlaying");
+            // app.MapHub<Hubs.TaskLoggingHub>("/taskLogging");
 
             app.UseStaticFiles();
 
             app.UseRouting();
 
-            app.UseCookiePolicy();
+            //app.UseCookiePolicy();
+            //app.UseCookiePolicy(new CookiePolicyOptions()
+            //{
+            //    Secure = CookieSecurePolicy.Always
+            //    //MinimumSameSitePolicy = SameSiteMode.None
+            //});
 
             app.UseAuthentication();
             app.UseAuthorization();

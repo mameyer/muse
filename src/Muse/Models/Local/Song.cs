@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using SpotifyApi.NetCore;
+using SpotifyAPI.Web;
 
 namespace Muse.Models.Local
 {
@@ -13,7 +13,7 @@ namespace Muse.Models.Local
         {
         }
 
-        public Song(SpotifyApi.NetCore.Track track)
+        public Song(SpotifyAPI.Web.FullTrack track)
         {
             if (track == null) return;
 
@@ -24,7 +24,7 @@ namespace Muse.Models.Local
             this.Uri = track.Uri?.Split(':').Last();
         }
 
-        public Song(SpotifyApi.NetCore.PlaylistTrack playlistTrack)
+        public Song(SpotifyAPI.Web.PlaylistTrack<SpotifyAPI.Web.FullTrack> playlistTrack)
         {
             if (playlistTrack == null) return;
 
@@ -48,7 +48,7 @@ namespace Muse.Models.Local
 
         [NotMapped]
 
-        public IEnumerable<Artist> Artists { get; set; }
+        public IEnumerable<SpotifyAPI.Web.SimpleArtist> Artists { get; set; }
 
         [NotMapped]
         public string ArtistsString

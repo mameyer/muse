@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Muse.Models;
-using SpotifyApi.NetCore;
-using SpotifyApi.NetCore.Models;
+using SpotifyAPI.Web;
 
 namespace Muse.Controllers.API
 {
@@ -25,11 +24,11 @@ namespace Muse.Controllers.API
             TimeRange tr = Enum.Parse<TimeRange>(timeRange);
 
             var accessToken = await GetAccessToken();
-            
-            var personalizationApi = new PersonalizationApi(this.httpClient, accessToken);
-            var artistsApi = new ArtistsApi(this.httpClient, accessToken);
+            var spotify = new SpotifyClient(accessToken);
 
-            int end = start + count;
+            return [];
+
+            /* int end = start + count;
             const int stepSize = 20;
 
             for (int i = start; i < end; i += stepSize)
@@ -66,7 +65,7 @@ namespace Muse.Controllers.API
                 };
             }
 
-            return genresWithRank;
+            return genresWithRank; */
         }
 
         public async Task<IEnumerable<Models.Local.Genre>> Get(string timeRange = "", int start = 0, int count = 20)

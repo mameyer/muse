@@ -5,8 +5,7 @@ using Muse.Models;
 using IF.Lastfm.Core.Api;
 using IF.Lastfm.Core.Objects;
 using System.Linq;
-using SpotifyApi.NetCore;
-using SpotifyApi.NetCore.Models;
+using SpotifyAPI.Web;
 
 namespace Muse.Controllers.API
 { 
@@ -27,8 +26,11 @@ namespace Muse.Controllers.API
             TimeRange tr = Enum.Parse<TimeRange>(timeRange);
 
             var accessToken = await GetAccessToken();
+            var spotify = new SpotifyClient(accessToken);
+
+            return [];
             
-            var personalizationApi = new PersonalizationApi(this.httpClient, accessToken);
+ /*            var personalizationApi = new PersonalizationApi(this.httpClient, accessToken);
 
             var lastfmClient = new LastfmClient("39520abbd99e05205e26166493059ff2", "e60062e594998f609305bf1999c371e2");
 
@@ -60,7 +62,7 @@ namespace Muse.Controllers.API
                 bands.AddRange(artists);
             }
 
-            return bands;
+            return bands; */
         }
 
         public async Task<IEnumerable<Models.Local.Band>> Get(string timeRange = "", int start = 0, int count = 20)

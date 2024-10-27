@@ -1,6 +1,5 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using SpotifyApi.NetCore;
+using SpotifyAPI.Web;
 
 namespace Muse.Controllers.API
 {
@@ -14,9 +13,8 @@ namespace Muse.Controllers.API
         public async Task<TrackAudioFeatures> Get(string Id)
         {
             var accessToken = await GetAccessToken();
-            var tracksApi = new TracksApi(this.httpClient, accessToken);
-            var tracksAudioFeatures = await tracksApi.GetTrackAudioFeatures(Id, accessToken);
-
+            var spotify = new SpotifyClient(accessToken);
+            var tracksAudioFeatures = await spotify.Tracks.GetAudioFeatures(Id);
             return tracksAudioFeatures;
         }
     }

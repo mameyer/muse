@@ -1,0 +1,74 @@
+﻿[
+  {
+    "Source": {
+	  "Project": "Models",
+      "Path": "..\\Models\\DBX"
+    },
+    "Target": {
+      "Path": "tsgenerator\\DBX"
+    }
+  },
+  {
+    "Source": {
+	  "Project": "Models",
+      "Path": "..\\Models\\DBXC"
+    },
+    "Target": {
+      "Path": "tsgenerator\\DBXC"
+    }
+  },
+  {
+    "Source": {
+	  "Project": "Models",
+      "Path": "..\\Models\\DMS"
+    },
+    "Target": {
+      "Path": "tsgenerator\\DMS"
+    }
+  },
+  {
+    "Source": {
+	  "Project": "Models",
+      "Path": "..\\Models\\RDB"
+    },
+    "Target": {
+      "Path": "tsgenerator\\RDB"
+    }
+  },
+  {
+    "Source": {
+	  "Project": "Models",
+      "Path": "..\\Models\\WPM"
+    },
+    "Target": {
+      "Path": "tsgenerator\\WPM"
+    }
+  },
+  {
+    "Source": {
+	  "Project": "Models",
+      "Path": "..\\Models\\Evaluation"
+    },
+    "Target": {
+      "Path": "tsgenerator\\Evaluation"
+    }
+  },
+  {
+    "Source": {
+	  "Project": "Models",
+      "Path": "..\\Models\\PLCDataProvider"
+    },
+    "Target": {
+      "Path": "tsgenerator\\PLCDataProvider"
+    }
+  },
+  {
+    "Source": {
+	  "Project": "Models",
+      "Path": "..\\Models\\Enums"
+    },
+    "Target": {
+      "Path": "tsgenerator\\Enums"
+    }
+  }
+]

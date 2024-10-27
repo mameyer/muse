@@ -29,7 +29,7 @@ namespace Muse
             var host = WebHost.CreateDefaultBuilder(args)
                 .UseUrls(config["url"])
                 .UseConfiguration(config)
-                .UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration.ReadFrom.Configuration(hostingContext.Configuration))
+                //.UseSerilog((hostingContext, loggerConfiguration) => loggerConfiguration.ReadFrom.Configuration(hostingContext.Configuration))
                 .UseStartup<Startup>()
                 .Build();
 

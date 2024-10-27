@@ -1,0 +1,23 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "moduleResolution": "Classic",
+    "module": "None",
+    //"inlineSourceMap": true,
+    "sourceMap": true,
+    "target": "ESNext",
+    "skipLibCheck": true,
+    "allowJs": true,
+    "outDir": "wwwroot/js",
+    "esModuleInterop": false
+  },
+  "exclude": [
+    //"./node_modules/*"
+  ],
+  "include": [
+    "ResultTs/**/*"
+  ]
+}

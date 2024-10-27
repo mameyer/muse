@@ -15,14 +15,14 @@ namespace Muse.Models.Local
         {
         }
 
-        public Band(SpotifyApi.NetCore.Artist artist)
+        public Band(SpotifyAPI.Web.SimpleArtist artist)
         {
             if (artist == null) return;
 
             this.Id = artist.Id;
             this.Name = artist.Name;
-            this.Popularity = artist.Popularity;
-            this.ImageUri = artist.Images?.First()?.Url;
+            //this.Popularity = artist.Popularity;
+            //this.ImageUri = artist.Images?.First()?.Url;
         }
 
         public string Name { get; set; }

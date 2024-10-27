@@ -14,7 +14,7 @@ namespace Muse.Models.Local
         {
         }
 
-        public static IEnumerable<SingleTrack> CreateFromPlaylistTrack(SpotifyApi.NetCore.PlaylistTrack playlistTrack)
+        public static IEnumerable<SingleTrack> CreateFromPlaylistTrack(SpotifyAPI.Web.PlaylistTrack<SpotifyAPI.Web.FullTrack> playlistTrack)
         {
             if (playlistTrack == null) return null;
 
@@ -26,9 +26,9 @@ namespace Muse.Models.Local
                     SongId = playlistTrack.Track?.Id,
                     Song = new Song(playlistTrack.Track),
                     BandId = item.Id,
-                    Band = new Band(item),
+                    //Band = new Band(item),
                     AlbumId = playlistTrack.Track?.Album?.Id,
-                    Album = new Album(playlistTrack.Track?.Album)
+                    //Album = new Album(playlistTrack.Track?.Album)
                 });
             }
 

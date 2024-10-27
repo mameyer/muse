@@ -1,6 +1,5 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using SpotifyApi.NetCore;
+using SpotifyAPI.Web;
 
 namespace Muse.Controllers.API
 {
@@ -14,11 +13,9 @@ namespace Muse.Controllers.API
         public async Task<SavedAlbum[]> Get(int limit = 20, int offset = 0)
         {
             var accessToken = await GetAccessToken();
-            var libraryApi = new LibraryApi(this.httpClient, accessToken);
-            var page = await libraryApi.GetAlbums(accessToken, limit, offset);
-            var albums = page.Items;
-
-            return albums;
+            var spotify = new SpotifyClient(accessToken);
+            var albums = await spotify.Library.GetAlbums();
+            return albums?.Items?.ToArray();
         }
     }
 }

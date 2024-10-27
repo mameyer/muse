@@ -1,8 +1,9 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Muse.Helpers;
 using Muse.Models;
-using SpotifyApi.NetCore;
+using SpotifyAPI.Web;
 
 namespace Muse.Controllers.API
 {
@@ -13,10 +14,10 @@ namespace Muse.Controllers.API
         {
         }
 
-        public async Task<RecommendationsResult> Get([ModelBinder(typeof(NestedModelBinder<RecommendationOptions>))]RecommendationOptions options)
+        public async Task<RecommendationsResponse> Get([ModelBinder(typeof(NestedModelBinder<RecommendationOptions>))]RecommendationOptions options)
         {
             var accessToken = await GetAccessToken();
-            var browseApi = new BrowseApi(this.httpClient, accessToken);
+            var spotify = new SpotifyClient(accessToken);
 
             // Action<ITuneableTrackAttributesBuilder> buildTunableTrackAttributes = new Action<ITuneableTrackAttributesBuilder>(builder =>
             // {
@@ -50,8 +51,7 @@ namespace Muse.Controllers.API
             //     builder.TimeSignature(t => { t.Min(options.TimeSignature.Min); t.Max(options.TimeSignature.Max); t.Target(options.TimeSignature.Target); });
             // });
 
-            return  await browseApi.GetRecommendations(options.Artists,
-                    options.Genres, options.Tracks);
+            return  await spotify.Browse.GetRecommendations(new RecommendationsRequest { });
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Muse.Models.Local
         {
         }
 
-        public Album(SpotifyApi.NetCore.Album album)
+        public Album(SpotifyAPI.Web.FullAlbum album)
         {
             if (album == null) return;
 

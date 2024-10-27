@@ -28,22 +28,22 @@
           "destination": "wwwroot/js/devextreme/"
       },
       {
-          "library": "node_modules/devextreme/dist/js/",
+          "library": "node_modules/devextreme/bundles/dx.all.js",
           "provider": "filesystem",
           "destination": "wwwroot/js/devextreme/"
       },
-      {
-          // required if you set up localization
-          "library": "node_modules/devextreme/dist/js/localization/",
-          "provider": "filesystem",
-          "destination": "wwwroot/js/devextreme/localization"
-      },
-      {
-          // required if you use a VectorMap control
-          "library": "node_modules/devextreme/dist/js/vectormap-data/",
-          "provider": "filesystem",
-          "destination": "wwwroot/js/devextreme/vectormap-data"
-      },
+    //    {
+    //       // required if you set up localization
+    //       "library": "node_modules/devextreme/dist/js/localization/",
+    //       "provider": "filesystem",
+    //       "destination": "wwwroot/js/devextreme/localization"
+    //   },
+    //   {
+    //       // required if you use a VectorMap control
+    //       "library": "node_modules/devextreme/dist/js/vectormap-data/",
+    //       "provider": "filesystem",
+    //       "destination": "wwwroot/js/devextreme/vectormap-data"
+    //   },
       {
           "library": "node_modules/devextreme/dist/css/dx.common.css",
           "provider": "filesystem",
@@ -69,6 +69,11 @@
           "library": "node_modules/devextreme-aspnet-data/js/dx.aspnet.data.js",
           "provider": "filesystem",
           "destination": "wwwroot/js/devextreme"
+      },
+      {
+        "library": "node_modules/devextreme/bundles/dx.all.d.ts",
+        "provider": "filesystem",
+        "destination": "TSLib/devextreme"
       }
   ]
 }

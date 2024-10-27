@@ -1,0 +1,24 @@
+﻿[
+  {
+    "Project": "MCSManager",
+    "Path": "..\\..\\..\\MCSManager",
+    "Items": [
+      {
+        "Source": {
+          "Path": "..\\..\\..\\..\\DevExtreme\\Evaluation\\Models"
+        },
+        "Target": {
+          "Path": "..\\..\\..\\ResultTs\\DevExtreme\\Evaluation\\Models"
+        }
+      },
+      {
+        "Source": {
+          "Path": "..\\..\\..\\..\\DevExtreme\\Evaluation"
+        },
+        "Target": {
+          "Path": "..\\..\\..\\ResultTs\\DevExtreme\\Evaluation"
+        }
+      }
+    ]
+  }
+]

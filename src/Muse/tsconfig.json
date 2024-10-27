@@ -1,0 +1,19 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": false,
+    "target": "es5",
+    "outDir": "wwwroot/js/Views"
+  },
+  //"rootDirs": [ "Views" ],
+  "include": [
+    "TSLib/devextreme/dx.all.d.ts",
+    "Views/*/ts/*",
+  ],
+  //"devDependencies": {
+  //  "@types/jquery": "3.5.1"
+  //}
+}
