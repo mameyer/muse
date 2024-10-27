@@ -11,10 +11,7 @@ namespace Muse.Views
         public LastFMRequestUrl: string;
 
         constructor(window: Window) {
-            window["featureAnalysis"] = () => this.featureAnalysis();
-            window["updateAudioAnalysisChartConstantLines"] = () => this.updateAudioAnalysisChartConstantLines(null);
-            window["audioAnalysis"] = () => this.audioAnalysis();
-            window["currentPlayingCallback"] = () => this.currentPlayingCallback(false, null);
+            window["currentPlayingCallback"] = (hasChanged, diff) => this.currentPlayingCallback(hasChanged, diff);
         }
 
         getFeaturesAnalysisForm() {

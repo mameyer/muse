@@ -128,7 +128,6 @@
                             || (e != null && currentTrack == null)
                             || (e != null && currentTrack != null && e.item.id != currentTrack.item.id)) {
                             updated = true;
-                            console.debug(e);
                         }
 
                         currentTrack = e;
@@ -159,12 +158,11 @@
                 }
 
                 var diff = Date.now() - lastRequest;
-                currentPlayingCallback(updated, diff);
+                if (window["currentPlayingCallback"] != null) {
+                    currentPlayingCallback(updated, diff);
+                }
                 lastUpdate = Date.now();
             }, 800);
-
-            function currentPlayingCallback(hasChanged, diff) {
-            }
         </script>
 
         @RenderSection("Scripts", required: false)
