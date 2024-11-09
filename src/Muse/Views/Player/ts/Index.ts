@@ -1,11 +1,11 @@
-namespace Muse.Views
+namespace muse.views
 {
     export class Player
     {
         useGIF: boolean = false;
         audioAnalysisSections: any = null;
         loudnessMax: number = 60;
-        currentTrack: any;
+        currentTrack: Muse.Interfaces.DTO.ICurrentlyPlayingDTO;
         public FeatureAnalysisUrl: string;
         public AudioAnalysisUrl: string;
         public LastFMRequestUrl: string;

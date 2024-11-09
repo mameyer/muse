@@ -1,0 +1,12 @@
+[
+    {
+        "Source": {
+            "Project": "Player",
+            "Path": "./../Player/Interfaces/DTO"
+        },
+        "Target": {
+            "Project": "Muse",
+            "Path": "./TSLib/Player"
+        }
+    }
+]

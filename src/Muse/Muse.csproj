@@ -24,11 +24,13 @@
     <PackageReference Include="SpotifyAPI.Web" Version="7.2.1" />
     <!-- Optional Auth module, which includes an embedded HTTP Server for OAuth2 -->
     <PackageReference Include="SpotifyAPI.Web.Auth" Version="7.2.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="TSGenerator" Version="1.0.12" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../BackgroundServices/BackgroundServices.csproj" />
-    <!-- <ProjectReference Include="../SpotifyApi/src/SpotifyApi.NetCore/SpotifyApi.NetCore.csproj" /> -->
+    <ProjectReference Include="../Player/Player.csproj" />
   </ItemGroup>
 
 </Project>

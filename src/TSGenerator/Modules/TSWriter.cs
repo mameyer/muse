@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -121,11 +120,11 @@ namespace TSGenerator.Modules
             foreach (PropertyInfo property in properties)
             {
                 var propertyName = property.Name;
-                IEnumerable<JsonPropertyAttribute> jsonPropertyAttributes = null;
+                IEnumerable<System.Text.Json.Serialization.JsonPropertyNameAttribute> jsonPropertyAttributes = null;
 
                 try
                 {
-                    jsonPropertyAttributes = property.GetCustomAttributes<JsonPropertyAttribute>();
+                    jsonPropertyAttributes = property.GetCustomAttributes<System.Text.Json.Serialization.JsonPropertyNameAttribute>();
                 }
                 catch (Exception ex)
                 {
@@ -138,10 +137,10 @@ namespace TSGenerator.Modules
                     && jsonPropertyAttributes.Any())
                 {
                     streamWriter.WriteIdent(ident, $"/* found json property attribute for property name {propertyName} */");
-                    propertyName = jsonPropertyAttributes.First().PropertyName;
+                    propertyName = jsonPropertyAttributes.First().Name;
                 }
 
-                var jsonIgnoreAttributes = property.GetCustomAttributes<JsonIgnoreAttribute>();
+                var jsonIgnoreAttributes = property.GetCustomAttributes<System.Text.Json.Serialization.JsonIgnoreAttribute>();
                 if (jsonIgnoreAttributes != null
                     && jsonIgnoreAttributes.Any())
                 {

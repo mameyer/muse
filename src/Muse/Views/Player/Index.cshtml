@@ -27,7 +27,7 @@
     <script type="text/javascript">
         var loudness_max = 60;
         
-        var site = new Muse.Views.Player(window);
+        var site = new muse.views.Player(window);
         site.FeatureAnalysisUrl = '@Url.Action("Get", "FeatureAnalysisApi")';
         site.AudioAnalysisUrl = '@Url.Action("Get", "AudioAnalysisApi")';
         site.LastFMRequestUrl = '@Url.Action("Get", "LastFMApi")';

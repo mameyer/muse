@@ -32,6 +32,7 @@ namespace TSGenerator.Modules
             this.Log("load assemblies:");
             foreach (var dll in dllMapping)
             {
+                this.Log($"-- {dll.Key}: load assembly..");
                 Assembly assembly = null;
                 try
                 {

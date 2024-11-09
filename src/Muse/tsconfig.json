@@ -11,6 +11,7 @@
   //"rootDirs": [ "Views" ],
   "include": [
     "TSLib/devextreme/dx.all.d.ts",
+    "TSLib/Player/*",
     "Views/*/ts/*",
   ],
   //"devDependencies": {
