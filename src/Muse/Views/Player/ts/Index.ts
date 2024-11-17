@@ -5,7 +5,7 @@ namespace muse.views
         useGIF: boolean = false;
         audioAnalysisSections: any = null;
         loudnessMax: number = 60;
-        currentTrack: Muse.Interfaces.DTO.ICurrentlyPlayingDTO;
+        currentTrack: Player.Interfaces.DTO.ICurrentlyPlayingDTO;
         public FeatureAnalysisUrl: string;
         public AudioAnalysisUrl: string;
         public LastFMRequestUrl: string;
@@ -26,7 +26,7 @@ namespace muse.views
             $.ajax({
                 url: this.FeatureAnalysisUrl,
                 data: {
-                    Id: this.currentTrack.item.id
+                    id: this.currentTrack.item.id
                 },
                 success: (result) => {
                     this.getFeaturesAnalysisForm().option("formData", result);
@@ -42,14 +42,20 @@ namespace muse.views
             let audioAnalysisChart = this.getAudioAnalysisChart();
             let constantLines = [];
 
-            if (this.audioAnalysisSections) constantLines = this.audioAnalysisSections;
+            if (this.audioAnalysisSections) {
+                constantLines = this.audioAnalysisSections;
+            }
 
-            let progress = this.currentTrack.progress_ms;
-            if (diff) progress += diff;
+            let progress = this.currentTrack.progressMs;
+            if (diff) {
+                progress += diff;
+            }
 
             let seconds = progress / 1000.0;
 
-            if (this.currentTrack.progress_ms) constantLines = constantLines.concat([ { value: seconds, color: 'red', dashStyle: 'dash', width: 3 } ]);
+            if (this.currentTrack.progressMs) {
+                constantLines = constantLines.concat([ { value: seconds, color: 'red', dashStyle: 'dash', width: 3 } ]);
+            }
 
             audioAnalysisChart.option("argumentAxis.constantLines", constantLines);
 
@@ -116,7 +122,9 @@ namespace muse.views
         }
 
         audioAnalysis() {
-            if (!this.currentTrack) return;
+            if (!this.currentTrack) {
+                return;
+            }
 
             $.ajax({
                 url: this.AudioAnalysisUrl,

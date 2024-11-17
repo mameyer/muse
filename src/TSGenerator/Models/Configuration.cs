@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 
 namespace TSGenerator.Models
 {
@@ -16,10 +16,11 @@ namespace TSGenerator.Models
             string jsonString = System.IO.File.ReadAllText(file.FullName);
             try
             {
-                var configItems = JArray.Parse(jsonString);
+                var jsonDocument = JsonDocument.Parse(jsonString);
+                var configItems = jsonDocument.RootElement.EnumerateArray();
                 foreach (var item in configItems)
                 {
-                    items.Add(item.ToObject<BuildConfiguration>());
+                    items.Add(item.Deserialize<BuildConfiguration>());
                 }
             }
             catch { }

@@ -1,6 +1,6 @@
 ﻿<Project>
 	<PropertyGroup>
-		<_TSGeneratorTaskAssembly>..\tools\net8.0\TSGenerator.dll</_TSGeneratorTaskAssembly>
+		<_TSGeneratorTaskAssembly>..\tools\net9.0\TSGenerator.dll</_TSGeneratorTaskAssembly>
 	</PropertyGroup>
 
 	<UsingTask AssemblyFile="$(_TSGeneratorTaskAssembly)" TaskName="$(MSBuildThisFileName).TSBuildTask" />

@@ -1,14 +1,19 @@
 using System;
 using System.Threading.Tasks;
 using SpotifyAPI.Web;
+using Player.Models.DTO;
+using AutoMapper;
 
 namespace Muse.Controllers.API
 {
     public class CurrentlyPlayingApiController : BaseApiController
     {
-        public CurrentlyPlayingApiController()
+        private readonly IMapper _mapper;
+
+        public CurrentlyPlayingApiController(IMapper mapper)
             : base()
         {
+            this._mapper = mapper;
         }
 
         private async Task<CurrentlyPlayingContext> GetCurrentPlaybackInfo()
@@ -18,16 +23,16 @@ namespace Muse.Controllers.API
             return await spotify.Player.GetCurrentPlayback();
         }
 
-        public async Task<object> Get()
+        public async Task<CurrentlyPlayingDTO> Get()
         {
             try
             {
                 var currentPlaybackContext = await GetCurrentPlaybackInfo();
-                return currentPlaybackContext;
+                return this._mapper.Map<CurrentlyPlayingDTO>(currentPlaybackContext);
             }
             catch (Exception ex)
             {
-                return new { Error = ex.Message };
+                return null;
             }
         }
     }

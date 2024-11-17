@@ -1,5 +1,5 @@
 using AutoMapper;
-using Muse.Models.DTO;
+using Player.Models.DTO;
 using SpotifyAPI.Web;
 
 namespace Muse.Mapping
@@ -10,6 +10,7 @@ namespace Muse.Mapping
         {
             CreateMap<Context, ContextDTO>();
             CreateMap<CurrentlyPlayingContext, CurrentlyPlayingDTO>();
+            CreateMap<IPlayableItem, PlayableItemDTO>();
         }
     }
 }

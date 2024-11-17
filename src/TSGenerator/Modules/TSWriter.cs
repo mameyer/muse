@@ -62,8 +62,8 @@ namespace TSGenerator.Modules
         {
             if (!string.IsNullOrEmpty(this.ModelFile.Namespace))
             {
-                //streamWriter.WriteIdent(0, $"declare module {this.ModelFile.Namespace} {{");
-                streamWriter.WriteIdent(0, $"namespace {this.ModelFile.Namespace} {{");
+                streamWriter.WriteIdent(0, $"declare namespace {this.ModelFile.Namespace} {{");
+                //streamWriter.WriteIdent(0, $"namespace {this.ModelFile.Namespace} {{");
                 return true;
             }
 
