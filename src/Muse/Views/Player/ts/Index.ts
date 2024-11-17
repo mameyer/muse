@@ -38,17 +38,12 @@ namespace muse.views
             return ($("#loudness") as any).dxChart("instance");
         }
 
-        updateAudioAnalysisChartConstantLines(diff) {
+        updateAudioAnalysisChartConstantLines(progress) {
             let audioAnalysisChart = this.getAudioAnalysisChart();
             let constantLines = [];
 
             if (this.audioAnalysisSections) {
                 constantLines = this.audioAnalysisSections;
-            }
-
-            let progress = this.currentTrack.progressMs;
-            if (diff) {
-                progress += diff;
             }
 
             let seconds = progress / 1000.0;
@@ -68,10 +63,6 @@ namespace muse.views
                 point.select();
 
                 let ps = filteredPoints.slice(Math.max(filteredPoints.length - 25, 0)).map((o, index) => ({ x: index +1, y: this.loudnessMax +  o.data.y_3 }));
-
-                //let s = loudnessChart.getSeriesByName("loudness");
-                //let p0 = s.getAllPoints()[0];
-                //p0.y = point.data.y_3;
 
 	            loudnessChart.option("dataSource", ps);
                 loudnessChart.option("valueAxis.visualRange", [40, this.loudnessMax+ 5]);
@@ -126,6 +117,8 @@ namespace muse.views
                 return;
             }
 
+            let progress = this.currentTrack?.item?.progress;
+
             $.ajax({
                 url: this.AudioAnalysisUrl,
                 data: {
@@ -175,7 +168,7 @@ namespace muse.views
 
                     this.audioAnalysisSections = sections;
                     
-                    this.updateAudioAnalysisChartConstantLines(null);
+                    this.updateAudioAnalysisChartConstantLines(progress);
                 }
             });
         }
@@ -217,8 +210,6 @@ namespace muse.views
                 this.audioAnalysis();
 
                 this.updateArtistInfo();
-            } else {
-                //if ((lastUpdate - newSince) > 500) this.updateAudioAnalysisChartConstantLines(diff);
             }
         }
 
@@ -235,11 +226,14 @@ namespace muse.views
                     track: this.currentTrack.item.name
                 },
                 success: (e) => {
-                    if (!e) return;
+                    if (!e) {
+                        return;
+                    }
+
                     $("#artist-info").html("<div>"
-                        + "<u>bio:</u></br>" + e.Artist.Bio.Summary + "<p></p>"
-                        + "<u>similar:</u></br>" + e.Artist.Similar.map(f => f.Name).join(",") + "<p></p>"
-                        + "<u>tags:</u></br>" + e.Track.TopTags.map(f => f.Name).join(",")
+                        + "<u>bio:</u></br>" + e.artist?.bio?.summary + "<p></p>"
+                        + "<u>similar:</u></br>" + e.artist?.similar?.map(f => f.name).join(",") + "<p></p>"
+                        + "<u>tags:</u></br>" + e.track?.topTags?.map(f => f.name).join(",")
                         + "</div>");
                 }
             });

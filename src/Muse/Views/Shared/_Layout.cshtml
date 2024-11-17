@@ -159,7 +159,7 @@
 
                 var diff = Date.now() - lastRequest;
                 if (window["currentPlayingCallback"] != null) {
-                    currentPlayingCallback(track, updated, diff);
+                    currentPlayingCallback(track, update, diff);
                 }
                 lastUpdate = Date.now();
             }, 800);

@@ -24,8 +24,8 @@ namespace Muse.Controllers.API
 
             return new
             {
-                Artist = lastArtist,
-                Track = lastTrack
+                artist = lastArtist,
+                track = lastTrack
             };
         }
     }
