@@ -38,8 +38,8 @@ namespace muse.views.player
             return ($("#loudness") as any).dxChart("instance");
         }
 
-        updateAudioAnalysisChartConstantLines(progress) {
-            if (!progress) {
+        updateAudioAnalysisChartConstantLines(progressMs) {
+            if (!progressMs) {
                 return;
             }
 
@@ -50,7 +50,7 @@ namespace muse.views.player
                 constantLines = this.audioAnalysisSections;
             }
 
-            let seconds = progress / 1000.0;
+            let seconds = progressMs / 1000.0;
 
             if (this.currentTrack.progressMs) {
                 constantLines = constantLines.concat([ { value: seconds, color: 'red', dashStyle: 'dash', width: 3 } ]);
@@ -121,7 +121,7 @@ namespace muse.views.player
                 return;
             }
 
-            let progress = this.currentTrack?.item?.progress;
+            let progress = this.currentTrack?.item?.progressMs;
 
             $.ajax({
                 url: this.AudioAnalysisUrl,
@@ -215,7 +215,7 @@ namespace muse.views.player
 
                 this.updateArtistInfo();
             } else {
-                 this.updateAudioAnalysisChartConstantLines(this.currentTrack?.item?.progress);
+                 this.updateAudioAnalysisChartConstantLines(this.currentTrack?.item?.progressMs);
             }
         }
 
