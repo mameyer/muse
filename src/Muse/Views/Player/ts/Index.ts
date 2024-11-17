@@ -38,8 +38,8 @@ namespace muse.views.player
             return ($("#loudness") as any).dxChart("instance");
         }
 
-        updateAudioAnalysisChartConstantLines(progressMs) {
-            if (!progressMs) {
+        updateAudioAnalysisChartConstantLines() {
+            if (this.currentTrack == null) {
                 return;
             }
 
@@ -50,9 +50,9 @@ namespace muse.views.player
                 constantLines = this.audioAnalysisSections;
             }
 
-            let seconds = progressMs / 1000.0;
+            let seconds = this.currentTrack.progressMs / 1000.0;
 
-            if (this.currentTrack.progressMs) {
+            if (this.currentTrack.progressMs > 0) {
                 constantLines = constantLines.concat([ { value: seconds, color: 'red', dashStyle: 'dash', width: 3 } ]);
             }
 
@@ -116,14 +116,12 @@ namespace muse.views.player
             }
         }
 
-        audioAnalysis() {
+        async audioAnalysis() {
             if (!this.currentTrack) {
                 return;
             }
 
-            let progress = this.currentTrack?.item?.progressMs;
-
-            $.ajax({
+            return $.ajax({
                 url: this.AudioAnalysisUrl,
                 data: {
                     Id: this.currentTrack.item.id
@@ -158,7 +156,7 @@ namespace muse.views.player
                             value: p.start,
                             color: "grey",
                             label: { text: "\nk: " + this.getPitchClass(p.key) + "\nconf: " + p.confidence + "\ntempo: " + p.tempo },
-                            width: (function(p) {
+                            width: ((p) => {
                                 let sectionWidth = 1;
                                 if (p.confidence >= 1) sectionWidth = 7;
                                 else if (p.confidence >= 0.75) sectionWidth = 6;
@@ -171,8 +169,6 @@ namespace muse.views.player
                             }));
 
                     this.audioAnalysisSections = sections;
-                    
-                    this.updateAudioAnalysisChartConstantLines(progress);
                 }
             });
         }
@@ -211,11 +207,14 @@ namespace muse.views.player
                 $("#track-info").html(result as any);
 
                 this.featureAnalysis();
-                this.audioAnalysis();
+                this.audioAnalysis()
+                    .then((e) => {
+                        this.updateAudioAnalysisChartConstantLines();
+                    });
 
                 this.updateArtistInfo();
             } else {
-                 this.updateAudioAnalysisChartConstantLines(this.currentTrack?.item?.progressMs);
+                 this.updateAudioAnalysisChartConstantLines();
             }
         }
 

@@ -149,20 +149,22 @@
                     currentTrack = getCurrentlyPlaying();
                     if (currentTrack != null
                         && (lastTrack == null
-                            || currentTrack.item.name != currentTrack.item.name)) {
+                            || lastTrack.item.name != currentTrack.item.name)) {
                         update = true;
+                        console.debug("new track..")
                         newSince = Date.now();
                         lastTrack = currentTrack;
                     }
 
                     lastRequest = Date.now();
                     lastUpdate = Date.now();
+                    
+                    if (window["currentPlayingCallback"] != null) {
+                        currentPlayingCallback(currentTrack, update, diff);
+                    }
                 }
 
                 let diff = Date.now() - lastRequest;
-                if (window["currentPlayingCallback"] != null) {
-                    currentPlayingCallback(currentTrack, update, diff);
-                }
                 lastUpdate = Date.now();
             }, 800);
         </script>
