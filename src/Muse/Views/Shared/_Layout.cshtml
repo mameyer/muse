@@ -114,17 +114,17 @@
             var newSince = null;
 
             function getCurrentlyPlaying() {
-                var track = null;
+                let track = null;
                 $.ajax({
                     url: '@Url.Action("Get", "CurrentlyPlayingApi")',
                     success: (e) => {
+                        console.debug(e);
                         track = e;
                         if (track && track.Error) {
                             window.location.href = "/login";
                         }
 
-                        var html = "";
-                        console.debug(track);
+                        let html = "";
 
                         if (track != null) {
                             if (track.item.name) html = track.item.name;
@@ -141,25 +141,27 @@
             }
 
             setInterval(function() {
-                var update = false;
+                let update = false;
+                let currentTrack = lastTrack;
                 if (lastRequest == null
                     || ((Date.now() - lastRequest) >= 2500))
                 {
-                    var track = getCurrentlyPlaying();
-                    if (lastTrack == null
-                        || track.item.name != track.item.name) {
+                    currentTrack = getCurrentlyPlaying();
+                    if (currentTrack != null
+                        && (lastTrack == null
+                            || currentTrack.item.name != currentTrack.item.name)) {
                         update = true;
                         newSince = Date.now();
-                        lastTrack = track;
+                        lastTrack = currentTrack;
                     }
 
                     lastRequest = Date.now();
                     lastUpdate = Date.now();
                 }
 
-                var diff = Date.now() - lastRequest;
+                let diff = Date.now() - lastRequest;
                 if (window["currentPlayingCallback"] != null) {
-                    currentPlayingCallback(track, update, diff);
+                    currentPlayingCallback(currentTrack, update, diff);
                 }
                 lastUpdate = Date.now();
             }, 800);

@@ -1,6 +1,6 @@
-namespace muse.views
+namespace muse.views.player
 {
-    export class Player
+    export class Index
     {
         useGIF: boolean = false;
         audioAnalysisSections: any = null;
@@ -39,6 +39,10 @@ namespace muse.views
         }
 
         updateAudioAnalysisChartConstantLines(progress) {
+            if (!progress) {
+                return;
+            }
+
             let audioAnalysisChart = this.getAudioAnalysisChart();
             let constantLines = [];
 
@@ -210,6 +214,8 @@ namespace muse.views
                 this.audioAnalysis();
 
                 this.updateArtistInfo();
+            } else {
+                 this.updateAudioAnalysisChartConstantLines(this.currentTrack?.item?.progress);
             }
         }
 
