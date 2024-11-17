@@ -143,6 +143,7 @@
             setInterval(function() {
                 let update = false;
                 let currentTrack = lastTrack;
+                let diff = Date.now() - (lastRequest ?? Date.now());
                 if (lastRequest == null
                     || ((Date.now() - lastRequest) >= 2500))
                 {
@@ -158,13 +159,12 @@
 
                     lastRequest = Date.now();
                     lastUpdate = Date.now();
-                    
+
                     if (window["currentPlayingCallback"] != null) {
                         currentPlayingCallback(currentTrack, update, diff);
                     }
                 }
 
-                let diff = Date.now() - lastRequest;
                 lastUpdate = Date.now();
             }, 800);
         </script>

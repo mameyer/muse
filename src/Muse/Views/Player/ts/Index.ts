@@ -23,6 +23,10 @@ namespace muse.views.player
         }
 
         featureAnalysis() {
+            if (this.currentTrack?.item == null) {
+                return;
+            }
+
             $.ajax({
                 url: this.FeatureAnalysisUrl,
                 data: {
@@ -50,10 +54,11 @@ namespace muse.views.player
                 constantLines = this.audioAnalysisSections;
             }
 
-            let seconds = this.currentTrack.progressMs / 1000.0;
+            let progressS = this.currentTrack.progressMs / 1000.0;
+            console.debug("progress: " + progressS +  "s");
 
-            if (this.currentTrack.progressMs > 0) {
-                constantLines = constantLines.concat([ { value: seconds, color: 'red', dashStyle: 'dash', width: 3 } ]);
+            if (progressS > 0) {
+                constantLines = constantLines.concat([ { value: progressS, color: 'red', dashStyle: 'dash', width: 3 } ]);
             }
 
             audioAnalysisChart.option("argumentAxis.constantLines", constantLines);
@@ -61,7 +66,7 @@ namespace muse.views.player
 	        let loudnessChart = this.getLoudnessChart();
 
             let series = audioAnalysisChart.getSeriesByName("segments");
-            let filteredPoints = series.getAllPoints().filter(e => e.data.x_3 < (seconds + 0.5));
+            let filteredPoints = series.getAllPoints().filter(e => e.data.x_3 < (progressS + 0.5));
             if (filteredPoints.length > 0) {
                 let point = filteredPoints[filteredPoints.length - 1];
                 point.select();
@@ -117,7 +122,7 @@ namespace muse.views.player
         }
 
         async audioAnalysis() {
-            if (!this.currentTrack) {
+            if (this.currentTrack?.item == null) {
                 return;
             }
 
@@ -177,15 +182,20 @@ namespace muse.views.player
             this.currentTrack = track;
 
             let result = $("<div>");
-            if (!this.currentTrack) {
+            if (this.currentTrack?.item == null) {
                 $("#track-info").html("loading..");
                 this.getFeaturesAnalysisForm().option("formData", result);
                 this.getAudioAnalysisChart().option("dataSource", []);
                 return;
             }
 
-            let url = this.currentTrack.item.album.images[0].url;
             if (hasChanged) {
+                let url = "";
+                if (this.currentTrack.item.album?.images != null
+                    && this.currentTrack.item.album?.images.length > 0) {
+                    url = this.currentTrack.item.album?.images[0].url;
+                }
+
                 $("<img>")
                     .css("float", "left")
                     .css("margin-top", "20px")
@@ -199,9 +209,9 @@ namespace muse.views.player
                     .css("margin-left", "20px")
                     .html("<h4>" + this.currentTrack.item.name + "</h4><p></p>"
                         + "<u>artists:</u> " + this.currentTrack.item.artists.map(f => f.name).join(", ") 
-                        + "  |  <u>album:</u> " + this.currentTrack.item.album.name + "<p></p>"
+                        + "  |  <u>album:</u> " + this.currentTrack.item.album?.name + "<p></p>"
                         + "<u>popularity:</u> " + this.currentTrack.item.popularity
-                        + "  |  <u>device:</u> " + this.currentTrack.device.name + "<p></p>"
+                        + "  |  <u>device:</u> " + this.currentTrack.device?.name + "<p></p>"
                         + "<div id='artist-info'></div>")
                     .appendTo(result);
                 $("#track-info").html(result as any);
@@ -219,7 +229,7 @@ namespace muse.views.player
         }
 
         updateArtistInfo() {
-            if (!this.currentTrack) {
+            if (this.currentTrack?.item?.artists == null) {
                 $("#artist-info").html("");
                 return;
             }
