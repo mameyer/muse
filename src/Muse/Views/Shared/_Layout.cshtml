@@ -108,34 +108,28 @@
         <script src="~/js/site.js" asp-append-version="true"></script>
        
         <script type="text/javascript">
-            var currentTrack = null;
+            var lastTrack = null;
             var lastRequest = null;
             var lastUpdate = null;
             var newSince = null;
 
             function getCurrentlyPlaying() {
-                var updated = false;
-
+                var track = null;
                 $.ajax({
                     url: '@Url.Action("Get", "CurrentlyPlayingApi")',
-                    success: function (e) {
-                        if (e && e.Error) {
+                    success: (e) => {
+                        track = e;
+                        if (track && track.Error) {
                             window.location.href = "/login";
                         }
 
                         var html = "";
-                        if ((e == null && currentTrack != null)
-                            || (e != null && currentTrack == null)
-                            || (e != null && currentTrack != null && e.item.id != currentTrack.item.id)) {
-                            updated = true;
-                        }
+                        console.debug(track);
 
-                        currentTrack = e;
-
-                        if (currentTrack != null) {
-                            if (currentTrack.item.name) html = currentTrack.item.name;
-                            if (currentTrack.item.artists && currentTrack.item.artists.length > 0) {
-                                html += " [" + currentTrack.item.artists[0].name + "]"
+                        if (track != null) {
+                            if (track.item.name) html = track.item.name;
+                            if (track.item.artists && track.item.artists.length > 0) {
+                                html += " [" + track.item.artists[0].name + "]"
                             }
                         }
                         $("#currently-playing").html(html);
@@ -143,15 +137,21 @@
                     async: false
                 });
 
-                return updated;
+                return track;
             }
 
             setInterval(function() {
-                var updated = false;
-                if (lastRequest == null || ((Date.now() - lastRequest) >= 2500))
+                var update = false;
+                if (lastRequest == null
+                    || ((Date.now() - lastRequest) >= 2500))
                 {
-                    updated = getCurrentlyPlaying();
-                    if (updated) newSince = Date.now();
+                    var track = getCurrentlyPlaying();
+                    if (lastTrack == null
+                        || track.item.name != track.item.name) {
+                        update = true;
+                        newSince = Date.now();
+                        lastTrack = track;
+                    }
 
                     lastRequest = Date.now();
                     lastUpdate = Date.now();
@@ -159,7 +159,7 @@
 
                 var diff = Date.now() - lastRequest;
                 if (window["currentPlayingCallback"] != null) {
-                    currentPlayingCallback(updated, diff);
+                    currentPlayingCallback(track, updated, diff);
                 }
                 lastUpdate = Date.now();
             }, 800);

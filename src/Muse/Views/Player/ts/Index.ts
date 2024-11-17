@@ -11,7 +11,7 @@ namespace muse.views
         public LastFMRequestUrl: string;
 
         constructor(window: Window) {
-            window["currentPlayingCallback"] = (hasChanged, diff) => this.currentPlayingCallback(hasChanged, diff);
+            window["currentPlayingCallback"] = (track, hasChanged, diff) => this.currentPlayingCallback(track, hasChanged, diff);
         }
 
         getFeaturesAnalysisForm() {
@@ -180,7 +180,9 @@ namespace muse.views
             });
         }
 
-        currentPlayingCallback(hasChanged, diff) {
+        currentPlayingCallback(track, hasChanged, diff) {
+            this.currentTrack = track;
+
             let result = $("<div>");
             if (!this.currentTrack) {
                 $("#track-info").html("loading..");
