@@ -104,6 +104,8 @@ namespace Muse
 
             services.AddHttpContextAccessor();
 
+            services.AddAutoMapper(typeof(Mapping.Default));
+
             services.AddSingleton<BackgroundServices.Interfaces.ILoggingService, Services.TaskLoggingService>();
 
             services.AddSingleton<IPlaylistsTaskQueue, PlaylistsTaskQueue>();

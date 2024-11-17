@@ -1,17 +1,14 @@
-var Muse;
-(function (Muse) {
-    var Views;
-    (function (Views) {
+var muse;
+(function (muse) {
+    var views;
+    (function (views) {
         var Player = /** @class */ (function () {
             function Player(window) {
                 var _this = this;
                 this.useGIF = false;
                 this.audioAnalysisSections = null;
                 this.loudnessMax = 60;
-                window["featureAnalysis"] = function () { return _this.featureAnalysis(); };
-                window["updateAudioAnalysisChartConstantLines"] = function () { return _this.updateAudioAnalysisChartConstantLines(null); };
-                window["audioAnalysis"] = function () { return _this.audioAnalysis(); };
-                window["currentPlayingCallback"] = function () { return _this.currentPlayingCallback(false, null); };
+                window["currentPlayingCallback"] = function (hasChanged, diff) { return _this.currentPlayingCallback(hasChanged, diff); };
             }
             Player.prototype.getFeaturesAnalysisForm = function () {
                 return $("#trackFeatures").dxForm("instance");
@@ -24,7 +21,7 @@ var Muse;
                 $.ajax({
                     url: this.FeatureAnalysisUrl,
                     data: {
-                        Id: this.currentTrack.item.id
+                        id: this.currentTrack.item.id
                     },
                     success: function (result) {
                         _this.getFeaturesAnalysisForm().option("formData", result);
@@ -38,14 +35,17 @@ var Muse;
                 var _this = this;
                 var audioAnalysisChart = this.getAudioAnalysisChart();
                 var constantLines = [];
-                if (this.audioAnalysisSections)
+                if (this.audioAnalysisSections) {
                     constantLines = this.audioAnalysisSections;
-                var progress = this.currentTrack.progress_ms;
-                if (diff)
+                }
+                var progress = this.currentTrack.progressMs;
+                if (diff) {
                     progress += diff;
+                }
                 var seconds = progress / 1000.0;
-                if (this.currentTrack.progress_ms)
+                if (this.currentTrack.progressMs) {
                     constantLines = constantLines.concat([{ value: seconds, color: 'red', dashStyle: 'dash', width: 3 }]);
+                }
                 audioAnalysisChart.option("argumentAxis.constantLines", constantLines);
                 var loudnessChart = this.getLoudnessChart();
                 var series = audioAnalysisChart.getSeriesByName("segments");
@@ -93,8 +93,9 @@ var Muse;
             };
             Player.prototype.audioAnalysis = function () {
                 var _this = this;
-                if (!this.currentTrack)
+                if (!this.currentTrack) {
                     return;
+                }
                 $.ajax({
                     url: this.AudioAnalysisUrl,
                     data: {
@@ -210,6 +211,6 @@ var Muse;
             };
             return Player;
         }());
-        Views.Player = Player;
-    })(Views = Muse.Views || (Muse.Views = {}));
-})(Muse || (Muse = {}));
+        views.Player = Player;
+    })(views = muse.views || (muse.views = {}));
+})(muse || (muse = {}));

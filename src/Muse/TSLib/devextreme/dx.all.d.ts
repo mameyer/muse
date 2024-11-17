@@ -1,7 +1,7 @@
 /**
 * DevExtreme (dx.all.d.ts)
-* Version: 24.1.6
-* Build date: Sat Sep 14 2024
+* Version: 24.1.7
+* Build date: Wed Oct 30 2024
 *
 * Copyright (c) 2012 - 2024 Developer Express Inc. ALL RIGHTS RESERVED
 * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
@@ -6374,7 +6374,7 @@ declare module DevExpress.events {
      */
     readonly model?: any;
     /**
-     * Specifies the executed event.
+     * A native browser event with additional fields from `EventObject`.
      */
     readonly event?: DxEvent<TNativeEvent>;
   }
@@ -27052,7 +27052,7 @@ declare module DevExpress.ui {
      */
     getSelectedRowKeys(): Array<TKey>;
     /**
-     * Gets the selected rows&apos; keys.
+     * Gets selected row keys.
      */
     getSelectedRowKeys(mode: string): Array<TKey>;
     /**
@@ -27060,7 +27060,7 @@ declare module DevExpress.ui {
      */
     getSelectedRowsData(): Array<TRowData>;
     /**
-     * Gets the selected rows&apos; data objects.
+     * Gets selected row data objects.
      */
     getSelectedRowsData(mode: string): Array<TRowData>;
     /**
@@ -39497,15 +39497,15 @@ declare module DevExpress.viz {
        */
       tick?: {
         /**
-         * Specifies the color of scale ticks (both major and minor ticks).
+         * Specifies the color of scale ticks (major ticks only).
          */
         color?: string;
         /**
-         * Specifies the opacity of scale ticks (both major and minor ticks).
+         * Specifies the opacity of scale ticks (major ticks only).
          */
         opacity?: number;
         /**
-         * Specifies the width of the scale&apos;s ticks (both major and minor ticks).
+         * Specifies the width of the scale&apos;s ticks (major ticks only).
          */
         width?: number;
       };
